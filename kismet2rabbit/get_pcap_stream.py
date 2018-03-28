@@ -25,7 +25,6 @@ from pcapng import block_total_length, block_processing
 from radiotap import radiotap_parse, ieee80211_parse
 from i80211_detail import i80211_info
 import pika
-#from influxdb import InfluxDBClient
 
 # debugging
 from scapy.all import hexdump
@@ -56,7 +55,7 @@ def main(kis_host, kis_port, kis_user, kis_pass):
             # we have a complete block and can start analyzing
             if (blocksize > 0 and len(stream) >= blocksize): 
 
-                print(hexdump(stream[:blocksize]), "\r\n")
+                #print(hexdump(stream[:blocksize]), "\r\n")
 
                 packet, block_information = block_processing(stream)
 
@@ -80,23 +79,25 @@ def main(kis_host, kis_port, kis_user, kis_pass):
                     
                     #print (cap_info)
 
-                    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-                    channel = connection.channel()
+                    if(cap_info.get('ESSID') != None):
 
-                    channel.queue_declare(queue='hello')
+                        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+                        channel = connection.channel()
 
-                    channel.basic_publish(exchange='',
-                                          routing_key='hello',
-                                          body='Hello World!')
-                    print(" [x] Sent 'Hello World!'")
-                    connection.close()
+                        channel.queue_declare(queue='hello')
+
+                        channel.basic_publish(exchange='',
+                                              routing_key='hello',
+                                              body=cap_info['ESSID'])
+                        print(" [x] Sent ",cap_info['ESSID'])
+                        connection.close()
 
                 package += 1
                 #print("Package ", package, "\r\n\r\n")
                 stream = stream[blocksize:]
 
-            if (package == 5):
-                break
+            #if (package == 5):
+            #    break
 
 
 if __name__ == '__main__':
