@@ -26,11 +26,23 @@ from radiotap import radiotap_parse, ieee80211_parse
 from i80211_detail import i80211_info
 import pika
 
-# debugging
+# debugging TODO remove in production
 from scapy.all import hexdump
 
 
-def main(kis_host, kis_port, kis_user, kis_pass):
+def parse(packet):
+
+    off, radiotap = radiotap_parse(packet)
+    off, i80211 = ieee80211_parse(packet, off)
+    i80211_detail = i80211_info(i80211, packet, off)
+    parsed = radiotap
+    parsed.update(i80211)
+    parsed.update(i80211_detail)
+
+    return parsed
+
+
+def main(kis_host, kis_port, kis_user, kis_pass, rab_host):
 
     s = requests.Session()
     s.auth = (kis_user, kis_pass)
@@ -41,7 +53,7 @@ def main(kis_host, kis_port, kis_user, kis_pass):
     
     stream = b'' # buffer for stream data
     interface_description = {}
-    package = 0 # just temporary counting
+    package = 0 # just temporary counting TODO remove in production
 
     # we always grap 4 octets at once, as pcapng pads blocks to 32bit
     for line in r.iter_content(chunk_size=4): 
@@ -55,10 +67,11 @@ def main(kis_host, kis_port, kis_user, kis_pass):
             # we have a complete block and can start analyzing
             if (blocksize > 0 and len(stream) >= blocksize): 
 
-                #print(hexdump(stream[:blocksize]), "\r\n")
+                #print(hexdump(stream[:blocksize]), "\r\n") # TODO remove in production
 
                 packet, block_information = block_processing(stream)
 
+                # update interface_description
                 if (block_information['block_type'][1] == 'Interface Description Block'):
                     interface_description = {
                             'linktype': block_information['linktype'],
@@ -66,22 +79,18 @@ def main(kis_host, kis_port, kis_user, kis_pass):
                             'if_name': block_information['if_name'],
                             }
 
+                # actual packet arrived, parsing and processing
                 if (packet != None):
 
-                    off, radiotap = radiotap_parse(packet)
-                    off, i80211 = ieee80211_parse(packet, off)
-                    i80211_detail = i80211_info(i80211, packet, off)
                     cap_info = interface_description
                     cap_info.update(block_information)
-                    cap_info.update(radiotap)
-                    cap_info.update(i80211)
-                    cap_info.update(i80211_detail)
-                    
-                    #print (cap_info)
+                    cap_info.update(parse(packet))
+
+                    #print (cap_info) #  TODO remove in production
 
                     if(cap_info.get('ESSID') != None):
 
-                        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+                        connection = pika.BlockingConnection(pika.ConnectionParameters(host=rab_host))
                         channel = connection.channel()
 
                         channel.queue_declare(queue='hello')
@@ -89,33 +98,35 @@ def main(kis_host, kis_port, kis_user, kis_pass):
                         channel.basic_publish(exchange='',
                                               routing_key='hello',
                                               body=cap_info['ESSID'])
-                        print(" [x] Sent ",cap_info['ESSID'])
+                        print(" [x] Sent ",cap_info)
                         connection.close()
 
-                package += 1
-                #print("Package ", package, "\r\n\r\n")
-                stream = stream[blocksize:]
+                package += 1 #  TODO remove in production
+                #print("Package ", package, "\r\n\r\n") # TODO remove in production
+                stream = stream[blocksize:] # make nothing gets lost, should always result in empty string though
 
-            #if (package == 5):
+            #if (package == 5): # TODO remove in production
             #    break
 
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description="Process Kismet's pcapng stream and sends it to Apache Kafka")
+    parser = argparse.ArgumentParser(description="Process Kismet's pcapng stream and sends it to RabbitMQ")
 
-    parser.add_argument("--kis_host", default="http://localhost", 
-                        help="host of kismet server", metavar="HOST")
-    parser.add_argument("--kis_port", default="2501", 
-                        help="port of kismet server", metavar="PORT")
-    parser.add_argument("--kis_user", default="kismet", 
-                        help="username for kismet server", metavar="USER")
-    parser.add_argument("--kis_pass", default="kismet", 
-                        help="password for kismet server", metavar="PASS")
+    parser.add_argument("--kismet_host", default="http://localhost", 
+                        help="host of Kismet server", metavar="HOST")
+    parser.add_argument("--kismet_port", default="2501", 
+                        help="port of Kismet server", metavar="PORT")
+    parser.add_argument("--kismet_user", default="kismet", 
+                        help="username for Kismet server", metavar="USER")
+    parser.add_argument("--kismet_pass", default="kismet", 
+                        help="password for Kismet server", metavar="PASS")
+    parser.add_argument("--rabbit_host", default="localhost",
+                        help="host of RabbitMQ server", metavar="HOST")
 
     args = parser.parse_args()
 
-    if (args.kis_host[0:4] != "http"):
-        args.kis_host = "http://" + args.kis_host
+    if (args.kismet_host[0:4] != "http"):
+        args.kismet_host = "http://" + args.kismet_host
 
-    main(args.kis_host, args.kis_port, args.kis_user, args.kis_pass)
+    main(args.kismet_host, args.kismet_port, args.kismet_user, args.kismet_pass, args.rabbit_host)

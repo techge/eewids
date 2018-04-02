@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ \! -f /var/run/docker.sock]
+then
+    echo "sudo systemctl start docker"
+    sudo systemctl start docker
+fi
+
 echo "Starting RabbitMQ"
 docker run -tid --net=host rabbitmq
 
