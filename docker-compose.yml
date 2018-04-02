@@ -1,54 +1,23 @@
 version: "3"
 services:
 
-  # kismet server based on git repo
-  kismet:
+  kismet-server:
     image: eewids/kismet:latest
+    network_mode: host
     ports:
       - "2501"
-      - "3501:3501"
-    networks:
-      - kismet
+      - "3501"
     tty: true
     stdin_open: true
 
-  # kismet-stream extracts the information from pcap stream of kismet server
-  kismet-stream:
-    build: kismet-stream
-    networks:
-      - kismet
-      - kafka
-    depends_on:
-      - kismet
-      - kafka
-    entrypoint: python get_pcap_stream.py --kis_host kismet
-
-  kafka:
-    image: wurstmeister/kafka # You should be able to adapt this repo to you own needs later
+  rabbit-server:
+    image: rabbitmq
+    network_mode: host
     ports:
-      - "9092:9092"
-    networks:
-      - kafka
-      - zookeeper
+      - "5672"
+
+  rabbit-recv:
+    build: rabbit/rabbit-recv
+    network_mode: host
     depends_on:
-      - zookeeper # TODO how can I ensure, that it does not depend on this explicit zoo service?
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 
-
-  # kafka needs zookeeper to work
-  # this uses official repo
-  # further information can found here https://github.com/31z4/zookeeper-docker
-  zookeeper:
-    image: zookeeper
-    restart: always
-    hostname: zoo1
-    networks:
-      - zookeeper
-    ports:
-      - 2181
-
-networks:
-  kismet:
-  zookeeper:
-  kafka:
-
+      - rabbit-server

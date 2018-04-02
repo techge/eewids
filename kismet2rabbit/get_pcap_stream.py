@@ -43,25 +43,28 @@ def parse(packet):
     return parsed
 
 
-def distribute(cap_info, rab_host):
+def distribute(cap_info, rab_host, rab_port):
 
     print (cap_info) #  TODO remove in production
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rab_host))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rab_host, port=rab_port))
     channel = connection.channel()
 
-    channel.queue_declare(queue='hello')
-
+    channel.exchange_declare(exchange='kismet_capture',
+                             exchange_type='direct')
+    
     message = json.dumps(cap_info)
 
-    channel.basic_publish(exchange='',
-                          routing_key='hello',
+    # routing_key based on frame subtype
+    channel.basic_publish(exchange='kismet_capture',
+                          routing_key=cap_info['subtype'][1],
                           body=message)
+    
     print(" [x] Sent ")#,message)
     connection.close()
 
 
-def main(kis_host, kis_port, kis_user, kis_pass, rab_host):
+def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
 
     s = requests.Session()
     s.auth = (kis_user, kis_pass)
@@ -85,8 +88,6 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host):
             # we have a complete block and can start analyzing
             if (blocksize > 0 and len(stream) >= blocksize): 
 
-                #print(hexdump(stream[:blocksize]), "\r\n") # TODO remove in production
-
                 packet, block_information = block_processing(stream)
 
                 # update interface_description
@@ -104,7 +105,7 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host):
                     cap_info.update(block_information)
                     cap_info.update(parse(packet))
 
-                    distribute(cap_info, rab_host)
+                    distribute(cap_info, rab_host, rab_port)
 
                 stream = stream[blocksize:] # make sure nothing gets lost, should always result in empty string though
 
@@ -123,10 +124,12 @@ if __name__ == '__main__':
                         help="password for Kismet server", metavar="PASS")
     parser.add_argument("--rabbit_host", default="localhost",
                         help="host of RabbitMQ server", metavar="HOST")
+    parser.add_argument("--rabbit_port", default="5672", 
+                        help="port of RabbitMQ server", metavar="PORT")
 
     args = parser.parse_args()
 
     if (args.kismet_host[0:4] != "http"):
         args.kismet_host = "http://" + args.kismet_host
 
-    main(args.kismet_host, args.kismet_port, args.kismet_user, args.kismet_pass, args.rabbit_host)
+    main(args.kismet_host, args.kismet_port, args.kismet_user, args.kismet_pass, args.rabbit_host, args.rabbit_port)
