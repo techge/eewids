@@ -20,15 +20,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import sys
 import argparse
-import requests
-from pcapng import block_total_length, block_processing 
-from radiotap import radiotap_parse, ieee80211_parse
-from i80211_detail import i80211_info
 import json
 import pika
-
-# debugging TODO remove in production
-from scapy.all import hexdump
+import requests
+from i80211_detail import i80211_info
+from pcapng import block_total_length, block_processing 
+from radiotap import radiotap_parse, ieee80211_parse
 
 
 def parse(packet):
@@ -45,8 +42,6 @@ def parse(packet):
 
 def distribute(cap_info, rab_host, rab_port):
 
-    print (cap_info) #  TODO remove in production
-
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=rab_host, port=rab_port))
     channel = connection.channel()
 
@@ -60,7 +55,7 @@ def distribute(cap_info, rab_host, rab_port):
                           routing_key=cap_info['subtype'][1],
                           body=message)
     
-    print(" [x] Sent ")#,message)
+    print(" [x] Sent ",message)
     connection.close()
 
 

@@ -11,8 +11,11 @@ docker run -tid --net=host rabbitmq
 
 echo "Starting Kismet Stuff"
 docker run -tid --net=host eewids/kismet
-sleep 5
+sleep 10
 /usr/bin/kismet_cap_linux_wifi --connect localhost:3501 --source=wlp2s0 &
+
+echo "Starting kismet2rabbit"
+docker run -tid --net=host eewids/kismet2rabbit
 
 echo "Starting Rabbit-recv"
 docker run -ti --net=host rabbit-recv
