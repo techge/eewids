@@ -43,6 +43,24 @@ def parse(packet):
     return parsed
 
 
+def distribute(cap_info, rab_host):
+
+    print (cap_info) #  TODO remove in production
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rab_host))
+    channel = connection.channel()
+
+    channel.queue_declare(queue='hello')
+
+    message = json.dumps(cap_info)
+
+    channel.basic_publish(exchange='',
+                          routing_key='hello',
+                          body=message)
+    print(" [x] Sent ")#,message)
+    connection.close()
+
+
 def main(kis_host, kis_port, kis_user, kis_pass, rab_host):
 
     s = requests.Session()
@@ -54,7 +72,6 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host):
     
     stream = b'' # buffer for stream data
     interface_description = {}
-    package = 0 # just temporary counting TODO remove in production
 
     # we always grap 4 octets at once, as pcapng pads blocks to 32bit
     for line in r.iter_content(chunk_size=4): 
@@ -80,36 +97,16 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host):
                             'if_name': block_information['if_name'].decode('utf-8'),
                             }
 
-                # actual packet arrived, parsing and processing
+                # actual packet arrived, parsing and distributing 
                 if (packet != None):
 
                     cap_info = interface_description
                     cap_info.update(block_information)
                     cap_info.update(parse(packet))
 
-                    #print (cap_info) #  TODO remove in production
+                    distribute(cap_info, rab_host)
 
-                    if(cap_info.get('ESSID') != None):
-
-                        connection = pika.BlockingConnection(pika.ConnectionParameters(host=rab_host))
-                        channel = connection.channel()
-
-                        channel.queue_declare(queue='hello')
-
-                        message = json.dumps(cap_info)
-
-                        channel.basic_publish(exchange='',
-                                              routing_key='hello',
-                                              body=message)
-                        print(" [x] Sent ",message)
-                        connection.close()
-
-                package += 1 #  TODO remove in production
-                #print("Package ", package, "\r\n\r\n") # TODO remove in production
-                stream = stream[blocksize:] # make nothing gets lost, should always result in empty string though
-
-            #if (package == 5): # TODO remove in production
-            #    break
+                stream = stream[blocksize:] # make sure nothing gets lost, should always result in empty string though
 
 
 if __name__ == '__main__':

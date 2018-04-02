@@ -478,7 +478,7 @@ def ieee80211_parse(packet, offset):
             'addr2': macstr(addr2),
             'ba_ctrl': ba_ctrl,
             'ba_ssc': ba_ssc,
-            'ba_bitmap': ba_bitmap
+            'ba_bitmap': ba_bitmap.hex()
         })
         return offset, mac
 
