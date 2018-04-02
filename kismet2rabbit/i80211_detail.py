@@ -60,7 +60,7 @@ def beacon_processing(stream):
             length = tagged[i+1]
 
             beacon.update({
-                'ESSID': (tagged[i+2:i+2+length]),
+                'ESSID': (tagged[i+2:i+2+length]).decode('utf-8'),
             })
             break; # TODO remove this break if you want to process more fields!!!
 

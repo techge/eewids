@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ \! -f /var/run/docker.sock]
+if [ \! -e "/var/run/docker.sock" ]
 then
     echo "sudo systemctl start docker"
     sudo systemctl start docker

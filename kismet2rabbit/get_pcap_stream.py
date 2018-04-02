@@ -24,6 +24,7 @@ import requests
 from pcapng import block_total_length, block_processing 
 from radiotap import radiotap_parse, ieee80211_parse
 from i80211_detail import i80211_info
+import json
 import pika
 
 # debugging TODO remove in production
@@ -76,7 +77,7 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host):
                     interface_description = {
                             'linktype': block_information['linktype'],
                             'snaplen': block_information['snaplen'],
-                            'if_name': block_information['if_name'],
+                            'if_name': block_information['if_name'].decode('utf-8'),
                             }
 
                 # actual packet arrived, parsing and processing
@@ -95,10 +96,12 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host):
 
                         channel.queue_declare(queue='hello')
 
+                        message = json.dumps(cap_info)
+
                         channel.basic_publish(exchange='',
                                               routing_key='hello',
-                                              body=cap_info['ESSID'])
-                        print(" [x] Sent ",cap_info)
+                                              body=message)
+                        print(" [x] Sent ",message)
                         connection.close()
 
                 package += 1 #  TODO remove in production
