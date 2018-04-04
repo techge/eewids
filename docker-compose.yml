@@ -33,7 +33,7 @@ services:
       - rabbit-server
 
   essids:
-    build: examples/printESSIDs 
+    build: templates/python
     networks:
       - rabbit
     tty: true
