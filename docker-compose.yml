@@ -32,8 +32,8 @@ services:
     depends_on:
       - rabbit-server
 
-  rabbit-recv:
-    build: rabbit/rabbit-recv
+  essids:
+    build: examples/printESSIDs 
     networks:
       - rabbit
     tty: true
