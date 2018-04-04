@@ -42,7 +42,10 @@ def parse(packet):
 
 def distribute(cap_info, rab_host, rab_port):
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=rab_host, port=rab_port))
+    ConnectionParameters = pika.ConnectionParameters(host=rab_host,
+                                           port=rab_port,
+                                           connection_attempts=5)
+    connection = pika.BlockingConnection(ConnectionParameters)
     channel = connection.channel()
 
     channel.exchange_declare(exchange='kismet_capture',

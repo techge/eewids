@@ -3,23 +3,42 @@ services:
 
   kismet-server:
     image: eewids/kismet:latest
-    network_mode: host
+    networks:
+      - eewids
     ports:
-      - "2501"
-      - "3501"
+      - "3501:3501"
     tty: true
     stdin_open: true
 
   rabbit-server:
     image: rabbitmq
-    network_mode: host
-    ports:
-      - "5672:5672"
+    networks:
+      - eewids
+
+  kiscap2rabbit:
+    build: kismet-capture2rabbit
+    networks:
+      - eewids
+    tty: true
+    stdin_open: true
+    entrypoint:
+      - python
+      - kismet2rabbit.py
+      - --kismet_host
+      - kismet-server
+      - --rabbit_host
+      - rabbit-server
+    depends_on:
+      - rabbit-server
 
   rabbit-recv:
     build: rabbit/rabbit-recv
-    network_mode: host
+    networks:
+      - eewids
     tty: true
     stdin_open: true
     depends_on:
       - rabbit-server
+
+networks:
+  eewids:

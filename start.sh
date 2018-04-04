@@ -14,7 +14,7 @@ echo "starting kismet remote capture ..."
 /usr/bin/kismet_cap_linux_wifi --connect localhost:3501 --source=wlp2s0 &
 
 echo "attaching to rabbit-recv"
-docker-compose logs --follow rabbit-recv
+docker-compose logs --follow rabbit-recv 
 
 echo "killing everything :)"
 docker-compose down

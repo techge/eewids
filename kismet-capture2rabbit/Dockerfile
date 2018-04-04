@@ -2,7 +2,7 @@ FROM python:3-alpine
 
 RUN apk add --no-cache tcpdump
 
-WORKDIR /usr/src/kismet2rabbit
+WORKDIR /usr/src/kiscap2rabbit
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
