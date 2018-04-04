@@ -4,7 +4,7 @@ services:
   kismet-server:
     image: eewids/kismet:latest
     networks:
-      - eewids
+      - kismet
     ports:
       - "3501:3501"
     tty: true
@@ -13,12 +13,13 @@ services:
   rabbit-server:
     image: rabbitmq
     networks:
-      - eewids
+      - rabbit 
 
   kiscap2rabbit:
     build: kismet-capture2rabbit
     networks:
-      - eewids
+      - kismet
+      - rabbit 
     tty: true
     stdin_open: true
     entrypoint:
@@ -34,11 +35,12 @@ services:
   rabbit-recv:
     build: rabbit/rabbit-recv
     networks:
-      - eewids
+      - rabbit
     tty: true
     stdin_open: true
     depends_on:
       - rabbit-server
 
 networks:
-  eewids:
+  kismet:
+  rabbit:
