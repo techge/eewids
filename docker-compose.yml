@@ -14,10 +14,12 @@ services:
     image: rabbitmq
     network_mode: host
     ports:
-      - "5672"
+      - "5672:5672"
 
   rabbit-recv:
     build: rabbit/rabbit-recv
     network_mode: host
+    tty: true
+    stdin_open: true
     depends_on:
       - rabbit-server
