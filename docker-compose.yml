@@ -6,6 +6,7 @@ services:
     networks:
       - kismet
     ports:
+      - "2501:2501"
       - "3501:3501"
     tty: true
     stdin_open: true
@@ -30,16 +31,36 @@ services:
       - --rabbit_host
       - rabbit-server
     depends_on:
+      - kismet-server
       - rabbit-server
 
-  essids:
-    build: examples/printESSIDs 
+  kisale2rabbit:
+    build: kismet-alert2rabbit
+    networks:
+      - kismet
+      - rabbit
+    tty: true
+    stdin_open: true
+    entrypoint:
+      - python
+      - kismetalert2rabbit.py
+      - --kismet_host
+      - kismet-server
+      - --rabbit_host
+      - rabbit-server
+    depends_on:
+      - kismet-server
+      - rabbit-server
+
+  alert-print:
+    build: plugins/alert-print
     networks:
       - rabbit
     tty: true
     stdin_open: true
     depends_on:
       - rabbit-server
+
 
 networks:
   kismet:
