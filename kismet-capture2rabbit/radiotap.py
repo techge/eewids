@@ -1,24 +1,20 @@
 #!/usr/bin/env python
 
 '''
-Copyright (C) 2018 Alexander Paetzelt
-Copyright (c) 2012-2016 Bob Copeland <me@bobcopeland.com>
+Copyright (c) 2017-2018     Alexander Paetzelt <github ät techge de>
+Copyright (c) 2012-2016     Bob Copeland <me@bobcopeland.com>
 
-This file is part of EEWIDS 
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
 
-EEWIDS is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-EEWIDS is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 '''
 
 # example:
@@ -73,20 +69,32 @@ frame_type = {
 
 # frame subtype mapping
 frame_subtype = {
-    # Management frames
+# Management frames
     0x00: (0x00, "Association Request"),
     0x01: (0x01, "Association Response"),
     0x02: (0x02, "Reassociation Request"),
     0x03: (0x03, "Reassociation Response"),
     0x04: (0x04, "Probe Request"),
     0x05: (0x05, "Probe Response"),
+    0x06: (0x06, "Timing Advertisment"),
+    #0x07: (0x07, "Reserved"),
     0x08: (0x08, "Beacon"),
     0x09: (0x09, "ATIM"),
     0x0A: (0x0A, "Disassociation"),
     0x0B: (0x0B, "Authentication"),
     0x0C: (0x0C, "Deauthentication"),
     0x0D: (0x0D, "Action"),
-    # Control frames
+    0x0E: (0x0E, "Action No Ack"),
+    #0x0F: (0x0F, "Reserved"),
+# Control frames
+    #0x10: (0x10, "Reserved"),
+    #0x11: (0x11, "Reserved"),
+    #0x12: (0x12, "Reserved"),
+    #0x13: (0x13, "Reserved"),
+    0x14: (0x14, "Beamforming Report Poll"),
+    0x15: (0x15, "VHT NDP Announcement"),
+    0x16: (0x16, "Control Frame Extension"),
+    0x17: (0x17, "Control Wrapper"),
     0x18: (0x18, "Block Ack Request"),
     0x19: (0x19, "Block Ack"),
     0x1A: (0x1A, "PS-Poll"),
@@ -95,7 +103,7 @@ frame_subtype = {
     0x1D: (0x1D, "ACK"),
     0x1E: (0x1E, "CF-end"),
     0x1F: (0x1F, "CF-end + CF-ack"),
-    # Data frames
+# Data frames
     0x20: (0x20, "Data"),
     0x21: (0x21, "Data + CF-ack"),
     0x22: (0x22, "Data + CF-poll"),
@@ -109,8 +117,14 @@ frame_subtype = {
     0x2A: (0x2A, "QoS data + CF-poll"),
     0x2B: (0x2B, "QoS data + CF-ack + CF-poll"),
     0x2C: (0x2C, "QoS Null"),
+    #0x2D: (0x2D, "Reserved"),
     0x2E: (0x2E, "QoS + CF-poll (no data)"),
     0x2F: (0x2F, "QoS + Cf-ack (no data)"),
+# Extension
+    0x30: (0x30, "DMG Beacon"),
+    #0x31: (0x31, "Reserved"),
+    #...
+    #0x3F: (0x3F, "Reserved"),
 }
 
 
