@@ -494,7 +494,7 @@ def ieee80211_parse(packet, offset):
         'addr2': macstr(addr2),
         'addr3': macstr(addr3),
         'seq': seq >> 4,
-        'frag': seq & 3
+        'frag': seq & 0x0f
     })
 
     if is_qos(mac):
