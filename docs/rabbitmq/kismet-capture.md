@@ -26,7 +26,14 @@ length | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=ht
 interface_ID | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) | Interface this packet comes from
 time_high | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) | upper 32 bits of a 64-bit timestamp
 time_low | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) | lower 32 bits of a 64-bit timestamp 
-TODO add RADIOTAP fields 
+TSFT | [radiotap](http://www.radiotap.org/fields/TSFT.html) | Value in usec of the MAC’s 64-bit 802.11 Time Synchronization Function timer
+flags | [radiotap](http://www.radiotap.org/fields/Flags.html) | Properties of transmitted and received frames
+rate | [radiotap](http://www.radiotap.org/fields/Rate.html) | TX/RX data rate
+chan_freq | [radiotap](http://www.radiotap.org/fields/Channel.html) | Tx/Rx frequency in MHz
+chan_flags | [radiotap](http://www.radiotap.org/fields/Channel.html) | Channel flags
+dbm_antsignal | [radiotap](http://www.radiotap.org/fields/dB%20antenna%20signal.html) | RF signal power at the antenna
+rx_flags | [radiotap](http://www.radiotap.org/fields/RX%20flags.html) | Properties of received frames. 
+antenna | [radiotap](http://www.radiotap.org/fields/Antenna.html) | Unitless indication of the Rx/Tx antenna for this packet
 fc | 80211 | Full frame control field 
 protocol | 80211 | Protocol version (added for convenience) 
 type | 80211 | Frame type (added for convenience) 
@@ -38,10 +45,23 @@ If the frame type typically has three addresses the following information is inc
 
 Key | Belonging to layer | Description of field
 ----| ------------------ | --------------------
-addr2 | 80211 | Second address field 
-addr3 | 80211 | Third address field 
-seq | 80211 | Sequence number 
-frag | 80211 | Fragment number 
+addr2 | 80211 | Second address field
+addr3 | 80211 | Third address field
+seq | 80211 | Sequence number
+frag | 80211 | Fragment number
+
+The following information lays in the radiotap header and the presence depends on the setup (e.g. the card's and clients capabilities etc.). If it is present it will be included too.
+
+Key | Belonging to layer | Description of field
+----| ------------------ | --------------------
+mcs_flags | [radiotap](http://www.radiotap.org/fields/MCS.html) | Flags for MCS rate information
+mcs_known | [radiotap](http://www.radiotap.org/fields/MCS.html) |
+mcs_index | [radiotap](http://www.radiotap.org/fields/MCS.html) | 
+mcs_rate | [radiotap](http://www.radiotap.org/fields/MCS.html) |
+ampdu_refnum | [radiotap](http://www.radiotap.org/fields/A-MPDU%20status.html) | Frame was received as part of an a-MPDU, reference number field
+ampdu_flags | [radiotap](http://www.radiotap.org/fields/A-MPDU%20status.html) |
+ampdu_delim_crc_val | [radiotap](http://www.radiotap.org/fields/A-MPDU%20status.html) |
+ampdu_reserved | [radiotap](http://www.radiotap.org/fields/A-MPDU%20status.html) |
 
 Below are frame specific fields.
 
