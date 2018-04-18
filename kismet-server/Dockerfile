@@ -79,7 +79,6 @@ ADD kismet.conf /usr/local/etc/
 ADD kismet_httpd.conf /home/kismet/.kismet/
 
 ENTRYPOINT ["/usr/local/bin/kismet_server"]
-RUN ldd /usr/local/bin/kismet
 
 EXPOSE 2501
 EXPOSE 3501
