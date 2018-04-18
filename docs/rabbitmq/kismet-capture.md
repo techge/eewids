@@ -41,16 +41,7 @@ subtype | 80211 | Frame subtype (added for convenience)
 duration | 80211 | Duration field 
 addr1 | 80211 | First address field 
 
-If the frame type typically has three addresses the following information is included as well:
-
-Key | Belonging to layer | Description of field
-----| ------------------ | --------------------
-addr2 | 80211 | Second address field
-addr3 | 80211 | Third address field
-seq | 80211 | Sequence number
-frag | 80211 | Fragment number
-
-The following information lays in the radiotap header and the presence depends on the setup (e.g. the card's and clients capabilities etc.). If it is present it will be included too.
+The following information is situated in the radiotap header and the presence depends on the setup (e.g. the card's and clients capabilities etc.). If it is present it will be included too.
 
 Key | Belonging to layer | Description of field
 ----| ------------------ | --------------------
@@ -68,6 +59,13 @@ Below are frame specific fields.
 ## Management Frames
 The following information is sent aditionally in case the captured frame was a management frame
 (type == 'Management').
+
+Key | Belonging to layer | Description of field
+----| ------------------ | --------------------
+addr2 | 80211 | Second address field
+addr3 | 80211 | Third address field
+seq | 80211 | Sequence number
+frag | 80211 | Fragment number
 
 ### Beacon only
 The following information is sent aditionally in case the captured frame was a Beacon frame
@@ -97,16 +95,19 @@ ba_bitmap | 80211 | Block Ack bitmap
 The following information is sent aditionally in case the captured frame was a Data frame
 (type == 'Data').
 
-### QoS data/QoS Null only
-The following information is sent aditionally in case the captured frame was a QoS data or QoS Null frame
-(type == 'Data' and (subtype == 'QoS data' or subtype == 'QoS Null').
-
 Key | Belonging to layer | Description of field
 ----| ------------------ | --------------------
 addr2 | 80211 | Second address field 
 addr3 | 80211 | Third address field 
 seq | 80211 | Sequence number 
 frag | 80211 | Fragment number 
+
+### QoS data/QoS Null only
+The following information is sent aditionally in case the captured frame was a QoS data or QoS Null frame
+(type == 'Data' and (subtype == 'QoS data' or subtype == 'QoS Null').
+
+Key | Belonging to layer | Description of field
+----| ------------------ | --------------------
 addr4 | 80211 | Forth address field
 tid | 80211 | TID subfield
 eosp | 80211 | End of service period (EOSP) subfield 
