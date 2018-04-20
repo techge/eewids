@@ -46,8 +46,8 @@ addr1 | 80211 | First address field  | 1.0
 
 The following information is situated in the radiotap header and the presence depends on the setup (e.g. the card's and clients capabilities etc.). If it is present it will be included too.
 
-Key | Belonging to layer | Description of field
-----| ------------------ | --------------------
+Key | Belonging to layer | Description of field | since version
+----| ------------------ | -------------------- | -------------
 mcs_flags | radiotap: [MCS](http://www.radiotap.org/fields/MCS.html) | Flags for MCS rate information | 1.0
 mcs_known | radiotap: [MCS](http://www.radiotap.org/fields/MCS.html) | | 1.0
 mcs_index | radiotap: [MCS](http://www.radiotap.org/fields/MCS.html) |  | 1.0
@@ -63,8 +63,8 @@ Below are frame specific fields.
 The following information is sent aditionally in case the captured frame was a management frame
 (type == 'Management').
 
-Key | Belonging to layer | Description of field
-----| ------------------ | --------------------
+Key | Belonging to layer | Description of field | since version
+----| ------------------ | -------------------- | -------------
 addr2 | 80211 | Second address field | 1.0
 addr3 | 80211 | Third address field | 1.0
 seq | 80211 | Sequence number | 1.0
@@ -74,8 +74,8 @@ frag | 80211 | Fragment number | 1.0
 The following information is sent aditionally in case the captured frame was a Beacon frame
 (subtype == 'Beacon').
 
-Key | Belonging to layer | Description of field
-----| ------------------ | --------------------
+Key | Belonging to layer | Description of field | since version
+----| ------------------ | -------------------- | -------------
 BSSID | 80211 | This is the same as 'addr3' and only for convenience | 1.0
 ESSID | 80211 | The SSID sent | 1.0
 
@@ -87,8 +87,8 @@ The following information is sent aditionally in case the captured frame was a C
 The following information is sent aditionally in case the captured frame was a Block Ack frame
 (type == 'Control' and subtype == 'Block Ack').
 
-Key | Belonging to layer | Description of field
-----| ------------------ | --------------------
+Key | Belonging to layer | Description of field | since version
+----| ------------------ | -------------------- | -------------
 addr2 | 80211 | Second address field  | 1.0
 ba_ctrl | 80211 | Block Ack control field  | 1.0
 ba_ssc | 80211 | Block Ack starting sequence control  | 1.0
@@ -98,8 +98,8 @@ ba_bitmap | 80211 | Block Ack bitmap  | 1.0
 The following information is sent aditionally in case the captured frame was a Data frame
 (type == 'Data').
 
-Key | Belonging to layer | Description of field
-----| ------------------ | --------------------
+Key | Belonging to layer | Description of field | since version
+----| ------------------ | -------------------- | -------------
 addr2 | 80211 | Second address field  | 1.0
 addr3 | 80211 | Third address field  | 1.0
 seq | 80211 | Sequence number  | 1.0
@@ -109,8 +109,8 @@ frag | 80211 | Fragment number  | 1.0
 The following information is sent aditionally in case the captured frame was a QoS data or QoS Null frame
 (type == 'Data' and (subtype == 'QoS data' or subtype == 'QoS Null').
 
-Key | Belonging to layer | Description of field
-----| ------------------ | --------------------
+Key | Belonging to layer | Description of field | since version
+----| ------------------ | -------------------- | -------------
 addr4 | 80211 | Forth address field | 1.0
 tid | 80211 | TID subfield | 1.0
 eosp | 80211 | End of service period (EOSP) subfield  | 1.0
