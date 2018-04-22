@@ -17,7 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 '''
 
 import sys
-import struct
+from elements import parse_element_fields
 
 
 def i80211_info(i80211, packet, off):
@@ -33,42 +33,19 @@ def i80211_info(i80211, packet, off):
 
 def management(i80211, packet, off):
 
+    elements = parse_element_fields(packet[off:])
+
     if(i80211['subtype'][1] == 'Beacon' or 
        i80211['subtype'][1] == 'Probe Request' or 
        i80211['subtype'][1] == 'Probe Response'):
     
-        elements = {
+        elements.update({
                 'BSSID': i80211['addr3'],
-                }
-        elements.update(parse_element_fields(packet[off:]))
-        return elements
+                })
 
-    return {}
+    return elements
 
 
 def control(i80211, packet, off):
     return {}
-
-def parse_element_fields(stream):
-
-    elements = {}
-    offset = 12 # tagged fields
-
-    while (offset < (len(stream)-1)):
-
-        hdr_fmt = "<BB"
-        hdr_len = struct.calcsize(hdr_fmt)
-        elementID, length = struct.unpack_from(hdr_fmt, stream, offset)
-        offset += hdr_len
-
-        if (elementID == 0x00 and 'ESSID' not in elements):
-
-            elements.update({
-                'ESSID': (stream[offset:offset+length]).decode('utf-8', errors='replace'),
-            })
-            break; # TODO remove this break if you want to process more fields!!!
-
-        offset += length + 2
-
-    return elements 
 
