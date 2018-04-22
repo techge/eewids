@@ -28,23 +28,28 @@ def main(rab_host, rab_port):
 
     ConnectionParameters = pika.ConnectionParameters(host=rab_host,
                                                      port=rab_port,
-                                                     connection_attempts=5)
+                                                     connection_attempts=10)
     connection = pika.BlockingConnection(ConnectionParameters)
     channel = connection.channel()
 
     channel.exchange_declare(exchange='kismet_capture',
-                             exchange_type='direct')
+                             exchange_type='topic')
 
     result = channel.queue_declare(exclusive=True)
     queue_name = result.method.queue
 
-    channel.queue_bind(exchange='kismet_capture',
-                       queue=queue_name,
-                       routing_key='Beacon')
+    subtypes = ['Beacon', 'Probe Request', 'Probe Response']
+
+    for subtype in subtypes:
+
+        key = '*.*.' + subtype
+        channel.queue_bind(exchange='kismet_capture',
+                           queue=queue_name,
+                           routing_key=key)
 
     def callback(ch, method, properties, body):
         data = json.loads(body)
-        print(" [x] Captured %r" % data['ESSID'])
+        print(" [x] Captured %r: ESSID was %r" % (data['subtype'][1], data.get("ESSID")))
 
     channel.basic_consume(callback,
                           queue=queue_name,

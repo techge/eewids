@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 '''
 
 import sys
+import struct
 
 
 def i80211_info(i80211, packet, off):
@@ -32,13 +33,15 @@ def i80211_info(i80211, packet, off):
 
 def management(i80211, packet, off):
 
-    if(i80211['subtype'][1] == 'Beacon'):
+    if(i80211['subtype'][1] == 'Beacon' or 
+       i80211['subtype'][1] == 'Probe Request' or 
+       i80211['subtype'][1] == 'Probe Response'):
     
-        beacon = {
+        elements = {
                 'BSSID': i80211['addr3'],
                 }
-        beacon.update(beacon_processing(packet[off:]))
-        return beacon
+        elements.update(parse_element_fields(packet[off:]))
+        return elements
 
     return {}
 
@@ -46,25 +49,26 @@ def management(i80211, packet, off):
 def control(i80211, packet, off):
     return {}
 
+def parse_element_fields(stream):
 
-def beacon_processing(stream):
+    elements = {}
+    offset = 12 # tagged fields
 
-    fixed = stream[0:11]
-    tagged = stream[12:]
-    beacon = {}
-    i=0
+    while (offset < (len(stream)-1)):
 
-    while (i < (len(tagged)-1)):
+        hdr_fmt = "<BB"
+        hdr_len = struct.calcsize(hdr_fmt)
+        elementID, length = struct.unpack_from(hdr_fmt, stream, offset)
+        offset += hdr_len
 
-        if (tagged[i] == 0x00 and 'ESSID' not in beacon):
-            length = tagged[i+1]
+        if (elementID == 0x00 and 'ESSID' not in elements):
 
-            beacon.update({
-                'ESSID': (tagged[i+2:i+2+length]).decode('utf-8'),
+            elements.update({
+                'ESSID': (stream[offset:offset+length]).decode('utf-8', errors='replace'),
             })
             break; # TODO remove this break if you want to process more fields!!!
 
-        i += tagged[i+1] + 2
+        offset += length + 2
 
-    return beacon
+    return elements 
 

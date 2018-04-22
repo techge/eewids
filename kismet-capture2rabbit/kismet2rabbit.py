@@ -49,13 +49,14 @@ def distribute(cap_info, rab_host, rab_port):
     channel = connection.channel()
 
     channel.exchange_declare(exchange='kismet_capture',
-                             exchange_type='direct')
+                             exchange_type='topic')
     
     message = json.dumps(cap_info)
 
-    # routing_key based on frame subtype
+    # routing_key is if_name.type.subtype 
+    routing = cap_info['if_name'] + '.' + cap_info['type'][1] + '.' + cap_info['subtype'][1]
     channel.basic_publish(exchange='kismet_capture',
-                          routing_key=cap_info['subtype'][1],
+                          routing_key=routing,
                           body=message)
     
     print(" [x] Sent ",message)
