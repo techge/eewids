@@ -1,7 +1,7 @@
 Fields Submitted to Exchange "kismet_capture"
 =============================================
 
-This page tracks all information submitted to RabbitMQ on exchange 'kismet_capture'.
+This page tracks all fields of messages submitted to RabbitMQ on exchange ['kismet_capture'](kismet_capture-topics.md).
 
 *Note*: This information is still in constant change and not considered stable yet.
 

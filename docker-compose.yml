@@ -52,8 +52,8 @@ services:
       - kismet-server
       - rabbit-server
 
-  alert-print:
-    build: plugins/alert-print
+  print:
+    build: examples/printESSIDs
     networks:
       - rabbit
     tty: true
