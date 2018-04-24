@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 '''
 
 import sys
+from elements import parse_element_fields
 
 
 def i80211_info(i80211, packet, off):
@@ -32,39 +33,19 @@ def i80211_info(i80211, packet, off):
 
 def management(i80211, packet, off):
 
-    if(i80211['subtype'][1] == 'Beacon'):
-    
-        beacon = {
-                'BSSID': i80211['addr3'],
-                }
-        beacon.update(beacon_processing(packet[off:]))
-        return beacon
+    elements = parse_element_fields(packet[off:])
 
-    return {}
+    if(i80211['subtype'][1] == 'Beacon' or 
+       i80211['subtype'][1] == 'Probe Request' or 
+       i80211['subtype'][1] == 'Probe Response'):
+    
+        elements.update({
+                'BSSID': i80211['addr3'],
+                })
+
+    return elements
 
 
 def control(i80211, packet, off):
     return {}
-
-
-def beacon_processing(stream):
-
-    fixed = stream[0:11]
-    tagged = stream[12:]
-    beacon = {}
-    i=0
-
-    while (i < (len(tagged)-1)):
-
-        if (tagged[i] == 0x00 and 'ESSID' not in beacon):
-            length = tagged[i+1]
-
-            beacon.update({
-                'ESSID': (tagged[i+2:i+2+length]).decode('utf-8'),
-            })
-            break; # TODO remove this break if you want to process more fields!!!
-
-        i += tagged[i+1] + 2
-
-    return beacon
 

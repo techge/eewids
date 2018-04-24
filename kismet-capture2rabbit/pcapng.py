@@ -106,6 +106,11 @@ def block_interface_description(stream):
                 'if_name': stream[optionbyte + 4:optionbyte +4 + length],
             })
 
+        if (stream[optionbyte:optionbyte+2] == b'\x03\x00'):
+            block_information.update({
+                'if_description': stream[optionbyte + 4:optionbyte +4 + length],
+            })
+
         # end of option fields
         if (stream[optionbyte:optionbyte+2] == b'\x00\x00'):
             break

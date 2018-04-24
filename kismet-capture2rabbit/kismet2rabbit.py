@@ -21,23 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 import argparse
 import json
+import parser as p
 import pika
 import requests
-from i80211_detail import i80211_info
 from pcapng import block_total_length, block_processing 
-from radiotap import radiotap_parse, ieee80211_parse
-
-
-def parse(packet):
-
-    off, radiotap = radiotap_parse(packet)
-    off, i80211 = ieee80211_parse(packet, off)
-    i80211_detail = i80211_info(i80211, packet, off)
-    parsed = radiotap
-    parsed.update(i80211)
-    parsed.update(i80211_detail)
-
-    return parsed
 
 
 def distribute(cap_info, rab_host, rab_port):
@@ -49,13 +36,14 @@ def distribute(cap_info, rab_host, rab_port):
     channel = connection.channel()
 
     channel.exchange_declare(exchange='kismet_capture',
-                             exchange_type='direct')
+                             exchange_type='topic')
     
     message = json.dumps(cap_info)
 
-    # routing_key based on frame subtype
+    # routing_key is if_name.type.subtype 
+    routing = cap_info['if_name'] + '.' + cap_info['type'][1] + '.' + cap_info['subtype'][1]
     channel.basic_publish(exchange='kismet_capture',
-                          routing_key=cap_info['subtype'][1],
+                          routing_key=routing,
                           body=message)
     
     print(" [x] Sent ",message)
@@ -101,7 +89,7 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
 
                     cap_info = interface_description
                     cap_info.update(block_information)
-                    cap_info.update(parse(packet))
+                    cap_info.update(p.packet_parse(packet))
 
                     distribute(cap_info, rab_host, rab_port)
 
