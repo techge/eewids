@@ -91,7 +91,7 @@ subtype_table = [
     ]
 
 
-def detect_attack(data):
+def detect_attack(data, send_channel):
 
     detected = False
     
@@ -109,84 +109,86 @@ def detect_attack(data):
         # TODO
         alertname = 'SomethingTerrible'
         description = 'SomethingTerrible detected...'
-        # ...
+        # TODO ...
         
-        alert = [
-                'name': alertname
-                'description': description
-                # ...
-                ]
+        alert = {
+                'name': alertname,
+                'description': description,
+                # TODO ...
+                }
 
-        send_alert(alert)
+        send_alert(alert, send_channel)
 
 
-def send_alert(alert):
+def send_alert(alert, send_channel):
 
-    channel = connection.channel()
-    channel.exchange_declare(exchange='messages',
-                             exchange_type='topic')
-    
     message = json.dumps(alert)
 
     # TODO adapt routing_key; format is servicename.messagetype
     # see https://github.com/techge/eewids/blob/master/docs/rabbitmq/messages-topics.md
-    routing = 'app.alert' 
-    channel.basic_publish(exchange='kismet_capture',
-                          routing_key=routing,
-                          body=message)
+    key = 'app.alert' 
+    send_channel.basic_publish(exchange='messages',
+                               routing_key=key,
+                               body=message)
     
-    print(" [x] Alert %r sent.", % message)
-    connection.close()
+    print(" [x] Alert %r sent." % message)
 
 
 def main(rab_host, rab_port):
 
     # sanity check
-    if (!type_table and !subtype_table):
+    if not type_table and not subtype_table:
         print("No frame type or subtype choosen, please adapt type tables to your needs!")
         sys.exit()
 
+    # open Connection to RabbitMQ
     ConnectionParameters = pika.ConnectionParameters(host=rab_host,
                                                      port=rab_port,
                                                      connection_attempts=10)
     connection = pika.BlockingConnection(ConnectionParameters)
-    channel = connection.channel()
 
-    channel.exchange_declare(exchange='kismet_capture',
-                             exchange_type='topic')
+    # open channel to consume kismet capture
+    recv_channel = connection.channel()
+    recv_channel.exchange_declare(exchange='kismet_capture',
+                                  exchange_type='topic')
+
+    # open channel to publish alerts
+    send_channel = connection.channel()
+    send_channel.exchange_declare(exchange='messages',
+                                  exchange_type='topic')
 
     # TODO change exclusive to False if your detection can get split between multiple workers
-    result = channel.queue_declare(exclusive=True)
+    result = recv_channel.queue_declare(exclusive=True)
     queue_name = result.method.queue
 
     # queue binding per frame type choosen above
-    for key in type_table:
+    for frametype in type_table:
 
-        routing_key = '*.' + key + '.*'
-        channel.queue_bind('kismet_capture',
-                           queue_name,
-                           routing_key)
+        routing_key = '*.' + frametype + '.*'
+        recv_channel.queue_bind(exchange='kismet_capture',
+                           queue=queue_name,
+                           routing_key=key)
 
     # queue binding per frame subtype choosen above
-    for key in subtype_table:
+    for framesubtype in subtype_table:
 
-        routing_key = '*.*.' + key
-        channel.queue_bind('kismet_capture',
-                           queue_name,
-                           routing_key)
+        key = '*.*.' + framesubtype 
+        recv_channel.queue_bind(exchange='kismet_capture',
+                           queue=queue_name,
+                           routing_key=key)
 
     def callback(ch, method, properties, body):
 
         # data arrived begin the actual detection work in function above
         data = json.loads(body)
-        detect_attack(data)
+        detect_attack(data, send_channel)
 
-    channel.basic_consume(callback,
+    recv_channel.basic_consume(callback,
                           queue=queue_name,
                           no_ack=True)
 
     print(' [*] Starting detection. To exit press CTRL+C')
-    channel.start_consuming()
+    recv_channel.start_consuming()
 
 
 if __name__ == '__main__':
