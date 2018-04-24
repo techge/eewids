@@ -32,26 +32,26 @@ def main(rab_host, rab_port):
     connection = pika.BlockingConnection(ConnectionParameters)
     channel = connection.channel()
 
-    channel.exchange_declare(exchange='alerts',
-                             exchange_type='direct')
+    channel.exchange_declare(exchange='messages',
+                             exchange_type='topic')
 
     result = channel.queue_declare(exclusive=True)
     queue_name = result.method.queue
 
-    channel.queue_bind(exchange='alerts',
+    channel.queue_bind(exchange='messages',
                        queue=queue_name,
-                       routing_key='kismet_alerts')
+                       routing_key='*.*')
 
     def callback(ch, method, properties, body):
         data = json.loads(body)
-        print("Alert arrived: %r %r" % (data['kismet.alert.header'], data['kismet.alert.text']))
+        print("Alert arrived: %r %r" % (data['name'], data['text']))
         print(data)
 
     channel.basic_consume(callback,
                           queue=queue_name,
                           no_ack=True)
 
-    #print(' [*] Waiting for messages. To exit press CTRL+C')
+    print(' [*] Waiting for messages. To exit press CTRL+C')
     channel.start_consuming()
 
 

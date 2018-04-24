@@ -26,25 +26,19 @@ import requests
 import sched, time
 
 
-def distribute(data, rab_host, rab_port):
+def distribute(data, channel):
 
-    ConnectionParameters = pika.ConnectionParameters(host=rab_host,
-                                                     port=rab_port,
-                                                     connection_attempts=5)
-    connection = pika.BlockingConnection(ConnectionParameters)
-    channel = connection.channel()
-
-    channel.exchange_declare(exchange='alerts',
-                             exchange_type='direct')
+    # convert name and text to EEWIDS format
+    data['name'] = data.pop("kismet.alert.header")
+    data['text'] = data.pop("kismet.alert.text")
 
     message = json.dumps(data)
 
-    channel.basic_publish(exchange='alerts',
-                          routing_key='kismet_alerts',
+    channel.basic_publish(exchange='messages',
+                          routing_key='kismet.alert',
                           body=message)
 
-    print(" [x] Sent Alert %s: %s " % (data['kismet.alert.header'], data['kismet.alert.text']))
-    connection.close()
+    print(" [x] Sent Alert %s: %s " % (data['name'], data['text']))
 
 
 def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
@@ -52,6 +46,15 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
     sess = requests.Session()
     sess.auth = (kis_user, kis_pass)
     sess.get(kis_host + ':' + kis_port + '/session/check_session') # authenticate with kismet server 
+
+    ConnectionParameters = pika.ConnectionParameters(host=rab_host,
+                                                     port=rab_port,
+                                                     connection_attempts=5)
+    connection = pika.BlockingConnection(ConnectionParameters)
+
+    channel = connection.channel()
+    channel.exchange_declare(exchange='messages',
+                             exchange_type='topic')
 
     # we need to request alerts periodically
     # using 'sched' Event Scheduler to request every 10 seconds
@@ -69,7 +72,7 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
 
         if alertlist:
             for k in alertlist: 
-                distribute(k, rab_host, rab_port)
+                distribute(k, channel)
 
         sc.enter(10, 1, request_alerts, (sched, TS))
 
@@ -77,6 +80,9 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
     sc.enter(10, 1, request_alerts, (sc, TS))
     sc.run()
 
+    sess.close()
+    channel.close()
+    connection.close()
 
 
 if __name__ == '__main__':
