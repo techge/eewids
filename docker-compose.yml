@@ -1,0 +1,67 @@
+version: "3"
+services:
+
+  kismet-server:
+    image: eewids/kismet:latest
+    networks:
+      - kismet
+    ports:
+      - "2501:2501"
+      - "3501:3501"
+    tty: true
+    stdin_open: true
+
+  rabbit-server:
+    image: rabbitmq
+    networks:
+      - rabbit 
+
+  kiscap2rabbit:
+    build: kismet-capture2rabbit
+    networks:
+      - kismet
+      - rabbit 
+    tty: true
+    stdin_open: true
+    entrypoint:
+      - python
+      - kismet2rabbit.py
+      - --kismet_host
+      - kismet-server
+      - --rabbit_host
+      - rabbit-server
+    depends_on:
+      - kismet-server
+      - rabbit-server
+
+  kisale2rabbit:
+    build: kismet-alert2rabbit
+    networks:
+      - kismet
+      - rabbit
+    tty: true
+    stdin_open: true
+    entrypoint:
+      - python
+      - kismetalert2rabbit.py
+      - --kismet_host
+      - kismet-server
+      - --rabbit_host
+      - rabbit-server
+    depends_on:
+      - kismet-server
+      - rabbit-server
+
+  print:
+    build: examples/printESSIDs
+    networks:
+      - rabbit
+    tty: true
+    stdin_open: true
+    depends_on:
+      - rabbit-server
+
+
+networks:
+  kismet:
+  rabbit:
