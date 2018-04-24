@@ -53,7 +53,7 @@ services:
       - rabbit-server
 
   print:
-    build: examples/printESSIDs
+    build: plugins/alert-print/
     networks:
       - rabbit
     tty: true
