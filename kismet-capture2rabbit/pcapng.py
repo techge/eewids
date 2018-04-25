@@ -65,6 +65,8 @@ def block_section_header(stream):
         'minor_ver':    stream[14:16].hex(),
     }
 
+    # TODO read option fields (not used by Kismet though)
+
     enddata = int.from_bytes(stream[4:8], byteorder='little') - 4
 
     if (stream[4:8] != stream[enddata:]):
@@ -96,7 +98,7 @@ def block_interface_description(stream):
     optionbyte = 16
 
     # processing option fields
-    # there are a lot more option fields, but they does not seem to be used by Kismet
+    # TODO there are a lot more option fields, but they does not seem to be used by Kismet
     # -> ignoring for now
     while (optionbyte < enddata):
         
@@ -137,6 +139,8 @@ def block_enhanced(stream):
     }
 
     enddata = int.from_bytes(stream[4:8], byteorder='little') - 4
+    # TODO this is not necessarily end of data, as there might be EPB option field at the end
+    # -> may use captured packet length field instead
 
     if (stream[4:8] != stream[enddata:]):
         print("Warning: Enhanced Packet Block broken\r\n",
@@ -145,6 +149,10 @@ def block_enhanced(stream):
     if (stream[20:24] != stream[24:28]):
         print("Warning: Packet was not captured completey!")
 
+    # TODO should fields 'captured packet length' and 'original packet lenght' got saved?
+    # TODO parse option fields, probably not used by Kismet though
+
     off = stream[28:enddata]
+    # TODO why isn't off a number anyway?
 
     return off, block_information

@@ -29,38 +29,40 @@ import requests
 from pcapng import block_total_length, block_processing 
 
 
-def distribute(cap_info, rab_host, rab_port):
+def distribute(cap_info, channel):
 
-    ConnectionParameters = pika.ConnectionParameters(host=rab_host,
-                                           port=rab_port,
-                                           connection_attempts=5)
-    connection = pika.BlockingConnection(ConnectionParameters)
-    channel = connection.channel()
-
-    channel.exchange_declare(exchange='kismet_capture',
-                             exchange_type='topic')
-    
     message = json.dumps(cap_info)
 
     # routing_key is if_name.type.subtype 
-    routing = cap_info['if_name'] + '.' + cap_info['type'][1] + '.' + cap_info['subtype'][1]
+    key = cap_info['if_name'] + '.' + cap_info['type'][1] + '.' + cap_info['subtype'][1]
     channel.basic_publish(exchange='kismet_capture',
-                          routing_key=routing,
+                          routing_key=key,
                           body=message)
-    
+
     print(" [x] Sent ",message)
-    connection.close()
 
 
 def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
 
+    # connection to Kismet server
     s = requests.Session()
     s.auth = (kis_user, kis_pass)
     s.get(kis_host + ':' + kis_port + '/session/check_session') # authenticate with kismet server 
-    
+
     url = kis_host + ':' + kis_port + '/pcap/all_packets.pcapng'
     r = s.get(url, stream=True) # start pcapng stream
-    
+
+    # connection to RabbitMQ
+    ConnectionParameters = pika.ConnectionParameters(host=rab_host,
+                                                     port=rab_port,
+                                                     connection_attempts=10)
+    connection = pika.BlockingConnection(ConnectionParameters)
+
+    channel = connection.channel()
+    channel.exchange_declare(exchange='kismet_capture',
+                             exchange_type='topic')
+
+    # initializing vars
     stream = b'' # buffer for stream data
     interface_description = {}
 
@@ -93,10 +95,11 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
                     cap_info.update(block_information)
                     cap_info.update(p.packet_parse(packet))
 
-                    distribute(cap_info, rab_host, rab_port)
+                    distribute(cap_info, channel)
 
                 stream = stream[blocksize:] # make sure nothing gets lost, should always result in empty string though
 
+    connection.close()
 
 if __name__ == '__main__':
 
