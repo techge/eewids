@@ -181,26 +181,24 @@ def detect_rogueap(data, options):
         message.update({'reason': 'blacklist',})
         return 'alert', message
     
+    message['description'] = message['description'] + ' unknown'
+    message.update({'reason': 'unknown',})
+
+    # if option '--alert' is used, we don't care about knownAPs!
+    if options.get('alert'):
+        return 'alert', message
+
+    # save new APs if not on knownAP list
+    if options.get('train'):
+
+        if not save_new_ap(essid, bssid): # AP already known
+            return None, None
+
+    # send message
+    if options.get('info'):
+        return 'info', message
     else:
-
-        message['description'] = message['description'] + ' unknown'
-        message.update({'reason': 'unknown',})
-
-        # if option '--alert' is used, we don't care about knownAPs!
-        if options.get('alert'):
-            return 'alert', message
-
-        # save new APs if not on knownAP list
-        if options.get('train'):
-
-            if not save_new_ap(essid, bssid): # AP already known
-                return None, None
-
-        # send message
-        if options.get('info'):
-            return 'info', message
-        else:
-            return 'warning', message
+        return 'warning', message
 
 
 def send_message(messagetype, message_cont, send_channel):
@@ -213,6 +211,27 @@ def send_message(messagetype, message_cont, send_channel):
                                body=message)
     
     print(" [x] %r %r sent." % (messagetype, message_cont['description']))
+
+
+def queue_bindings(channel, queue_name, exch):
+
+    channel.queue_declare(queue=queue_name, exclusive=False)
+
+    # queue binding per frame type choosen above
+    for frametype in type_table:
+
+        routing_key = '*.' + frametype + '.*'
+        channel.queue_bind(exchange=exch,
+                           queue=queue_name,
+                           routing_key=key)
+
+    # queue binding per frame subtype choosen above
+    for framesubtype in subtype_table:
+
+        key = '*.*.' + framesubtype 
+        channel.queue_bind(exchange=exch,
+                           queue=queue_name,
+                           routing_key=key)
 
 
 def main(rab_host, rab_port, options):
@@ -233,36 +252,21 @@ def main(rab_host, rab_port, options):
     send_channel.exchange_declare(exchange='messages',
                                   exchange_type='topic')
 
-    result = recv_channel.queue_declare(exclusive=False)
-    queue_name = result.method.queue
-
-    # queue binding per frame type choosen above
-    for frametype in type_table:
-
-        routing_key = '*.' + frametype + '.*'
-        recv_channel.queue_bind(exchange='kismet_capture',
-                           queue=queue_name,
-                           routing_key=key)
-
-    # queue binding per frame subtype choosen above
-    for framesubtype in subtype_table:
-
-        key = '*.*.' + framesubtype 
-        recv_channel.queue_bind(exchange='kismet_capture',
-                           queue=queue_name,
-                           routing_key=key)
+    # create queue and bind topics based on choosen types
+    queue_bindings(recv_channel, 'rogueap', 'kismet_capture')
 
     def callback(ch, method, properties, body):
 
         # data arrived start the detection
         data = json.loads(body)
         messagetype, message_cont = detect_rogueap(data, options)
+
         if messagetype is not None:
             send_message(messagetype, message_cont, send_channel)
 
     recv_channel.basic_consume(callback,
-                          queue=queue_name,
-                          no_ack=True)
+                               queue='rogueap',
+                               no_ack=True)
 
     print(' [*] Starting detection. To exit press CTRL+C')
     recv_channel.start_consuming()
