@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 services:
 
   kismet-server:
@@ -53,6 +53,24 @@ services:
       - rabbit-server
 
   print:
+    build: examples/rogueAP/
+    networks:
+      - rabbit
+    volumes:
+      - type: bind
+        source: ./examples/rogueAP/lists
+        target: /lists
+    tty: true
+    stdin_open: true
+    depends_on:
+      - rabbit-server
+    entrypoint:
+      - python
+      - rogueap.py
+      - --train
+      - --info
+
+  print-alert:
     build: plugins/alert-print/
     networks:
       - rabbit

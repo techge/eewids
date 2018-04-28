@@ -1,0 +1,3 @@
+# prevent unintended leakage of sensitive data
+lists/knownAP.yml
+lists/whitelist.yml
