@@ -21,8 +21,8 @@ RUN apt-get update && apt-get install -y \
 # Clone git repo and build kismet
 RUN git clone https://www.kismetwireless.net/git/kismet.git && \
     cd kismet && \
-    ./configure && \
-    make -j4 && \
+    ./configure --disable-python-tools && \
+    make && \
     make install
 
 # This is kismet server only, no need for capture-tools
