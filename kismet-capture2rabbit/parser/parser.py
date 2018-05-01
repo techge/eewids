@@ -26,7 +26,9 @@ def packet_parse(packet):
 
     off, radiotap = radiotap_parse(packet)
     off, i80211 = ieee80211_parse(packet, off)
-    i80211_detail = i80211_info(i80211, packet, off)
+    # TODO fix ahead, better clean it!
+    # note: this is done to remove the frame check sequence from packet_data
+    i80211_detail = i80211_info(i80211, packet[0:len(packet)-4], off)
     parsed = radiotap
     parsed.update(i80211)
     parsed.update(i80211_detail)
