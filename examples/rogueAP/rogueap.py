@@ -168,7 +168,7 @@ def detect_rogueap(data, options):
 
     message = {
             'name': 'RogueAP',
-            'description': 'Access point (%s - %s)' % (essid, bssid),
+            'text': 'Access point (%s - %s)' % (essid, bssid),
             }
 
     if on_whitelist(essid, bssid):
@@ -177,11 +177,11 @@ def detect_rogueap(data, options):
 
     if on_blacklist(essid):
 
-        message['description'] = message['description'] + ' on blacklist!'
+        message['text'] = message['text'] + ' on blacklist!'
         message.update({'reason': 'blacklist',})
         return 'alert', message
     
-    message['description'] = message['description'] + ' unknown'
+    message['text'] = message['text'] + ' unknown'
     message.update({'reason': 'unknown',})
 
     # if option '--alert' is used, we don't care about knownAPs!
@@ -210,7 +210,7 @@ def send_message(messagetype, message_cont, send_channel):
                                routing_key=key,
                                body=message)
     
-    print(" [x] %r %r sent." % (messagetype, message_cont['description']))
+    print(" [x] %r %r sent." % (messagetype, message_cont['text']))
 
 
 def queue_bindings(channel, queue_name, exch):
