@@ -36,12 +36,25 @@ def _parse_country(packet, length, offset):
 def _parse_default(packet, length, offset):
     return {} 
 
+def _parse_fixed(packet):
+    hdr_fmt = "<QHH"
+    offset = struct.calcsize(hdr_fmt)
+    ts, interval, capabilities = struct.unpack_from(hdr_fmt, packet, 0)
+
+    return offset, {
+            'i80211_ts': ts,
+            'interval': interval,
+            'capabilities': capabilities,
+            }
+
 def parse_element_fields(packet):
 
-    elements = {}
-    offset = 12 # tagged fields
+    if len(packet) < 12:
+        return {}
 
-    while (offset < (len(packet)-1)):
+    offset, elements = _parse_fixed(packet)
+
+    while (offset < (len(packet)-2)):
 
         hdr_fmt = "<BB"
         hdr_len = struct.calcsize(hdr_fmt)
