@@ -19,10 +19,11 @@ RUN apt-get update && apt-get install -y \
     protobuf-c-compiler
 
 # Clone git repo and build kismet
-RUN git clone https://www.kismetwireless.net/git/kismet.git && \
+RUN git clone https://github.com/kismetwireless/kismet.git && \
     cd kismet && \
+    git reset --hard c4d58f035977f99480c0ad99fdb60642b208bf3e && \
     ./configure --disable-python-tools && \
-    make && \
+    make -j4 && \
     make install
 
 # This is kismet server only, no need for capture-tools
@@ -78,7 +79,8 @@ USER kismet
 ADD kismet.conf /usr/local/etc/
 ADD kismet_httpd.conf /home/kismet/.kismet/
 
-ENTRYPOINT ["/usr/local/bin/kismet_server"]
+ENTRYPOINT ["/usr/local/bin/kismet"]
+
 
 EXPOSE 2501
 EXPOSE 3501
