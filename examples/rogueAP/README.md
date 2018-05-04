@@ -13,12 +13,14 @@ Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 ## Characteristics
 
 * scalable (it does not make any difference, if one service sees all or just one frame, therefore multiple workers can get started based on load)
-* shared storage may needed to allow scalability (depends on [configuration](#how-lists-are-used), e.g. if a knownAP list should be saved)
+* shared storage needed to allow scalability (see [configuration](#how-lists-are-used), e.g. a knownAP list is saved)
 * needs network connection to: RabbitMQ
 
 ## General Approach
 
-The Rogue Access Point detection looks for new/forbidden ESSIDs or ESSID/BSSID combinations seen by the remote capture. Alerts, warnings or infos are published consequently.
+The service for rogue access point detection looks for new/forbidden ESSIDs or ESSID/BSSID combinations seen by the remote capture. Alerts, warnings or infos are published consequently.
+
+This service is called rogue access point detection, although this might be misleading as rogue AP is often referred to a WiFi AP connected to a secure network (see the wikipedia [article](https://en.wikipedia.org/wiki/Rogue_access_point)). However this tool is maybe more about finding ["evil twins"](https://en.wikipedia.org/wiki/Evil_twin_(wireless_networks)) or [honeypots](https://en.wikipedia.org/wiki/Honeypot_(computing)) which are indeed "rogue" access points within a organization. In a way it serves as a rogue AP detection in the classic meaning too, as one can detect every not authorized AP around.
 
 ### Black and Whitelists
 
@@ -26,7 +28,7 @@ The Rogue Access Point detection looks for new/forbidden ESSIDs or ESSID/BSSID c
 
 *Whitelists* are mappings of ESSIDs to a list of BSSIDs. Such, if a ESSID is on the allowed list, but the BSSID is not, this AP is not allowed. It is recommended to put ESSIDs of the whitelist on the blacklist, to ensure that every usage of this ESSID without allowed BSSID provokes an alert.
 
-Both, black- and whitelists are yaml formatted text files. They are called lists/whitelist.yml and lists/blacklist.yml.
+Both, black- and whitelists are yaml formatted text files. They are expected to be in lists/whitelist.yml and lists/blacklist.yml.
 
 Whitelists are scalars mapped to sequences, such as:
 

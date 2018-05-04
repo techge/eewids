@@ -60,7 +60,8 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
 
     channel = connection.channel()
     channel.exchange_declare(exchange='kismet_capture',
-                             exchange_type='topic')
+                             exchange_type='topic',
+                             durable=True,)
 
     # initializing vars
     stream = b'' # buffer for stream data

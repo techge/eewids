@@ -69,7 +69,7 @@ def block_section_header(stream):
 
     # TODO read option fields (not used by Kismet though)
 
-    end_length = struct.unpack_from("<I", stream, length - 4)
+    end_length, = struct.unpack_from("<I", stream, length - 4)
     if (length != end_length):
         print("Warning: Section Header Block broken\r\n",
               "first and second total length field do not match")
@@ -90,7 +90,7 @@ def block_interface_description(stream):
         'snaplen':      snaplen,
     }
 
-    end_length = struct.unpack_from("<I", stream, length - 4)
+    end_length, = struct.unpack_from("<I", stream, length - 4)
     if (length != end_length):
         print("Warning: Interface Description Block broken\r\n",
               "first and second total length field do not match")
@@ -141,7 +141,7 @@ def block_enhanced(stream):
         'original_pack_len':    orig_len,
     }
 
-    end_length = struct.unpack_from("<I", stream, length - 4)
+    end_length, = struct.unpack_from("<I", stream, length - 4)
     if (length != end_length):
         print("Warning: Enhanced Packet Block broken\r\n",
               "first and second total length field do not match")
