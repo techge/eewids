@@ -2,7 +2,7 @@ version: "3.2"
 services:
 
   kismet-server:
-    image: eewids/kismet:latest
+    image: eewids/kismet-server:stable
     networks:
       - kismet
     ports:
@@ -17,7 +17,7 @@ services:
       - rabbit 
 
   kiscap2rabbit:
-    build: kismet-capture2rabbit
+    image: eewids/kiscap2rabbit
     networks:
       - kismet
       - rabbit 
@@ -35,7 +35,7 @@ services:
       - rabbit-server
 
   kisale2rabbit:
-    build: kismet-alert2rabbit
+    image: eewids/kisale2rabbit
     networks:
       - kismet
       - rabbit
@@ -52,7 +52,7 @@ services:
       - kismet-server
       - rabbit-server
 
-  print:
+  rogueAP:
     build: examples/rogueAP/
     networks:
       - rabbit
@@ -69,15 +69,6 @@ services:
       - rogueap.py
       - --train
       - --info
-
-  print-alert:
-    build: plugins/alert-print/
-    networks:
-      - rabbit
-    tty: true
-    stdin_open: true
-    depends_on:
-      - rabbit-server
 
 
 networks:
