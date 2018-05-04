@@ -244,13 +244,9 @@ def main(rab_host, rab_port, options):
 
     # open channel to consume kismet capture
     recv_channel = connection.channel()
-    recv_channel.exchange_declare(exchange='kismet_capture',
-                                  exchange_type='topic')
 
     # open channel to publish alerts
     send_channel = connection.channel()
-    send_channel.exchange_declare(exchange='messages',
-                                  exchange_type='topic')
 
     # create queue and bind topics based on choosen types
     queue_bindings(recv_channel, 'rogueap', 'kismet_capture')
