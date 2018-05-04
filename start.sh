@@ -11,10 +11,10 @@ docker-compose up -d
 
 sleep 3
 echo "starting kismet remote capture ..."
-/usr/bin/kismet_cap_linux_wifi --connect localhost:3501 --source=wlp2s0 &
+/usr/bin/kismet_cap_linux_wifi --connect localhost:3501 --source=wlan0 &
 
 echo "attaching to example"
-docker-compose logs --follow print
+docker-compose logs --follow rogueAP
 
 echo "killing everything :)"
 docker-compose down
@@ -24,4 +24,4 @@ echo "I am just waiting some time..."
 sleep 3
 
 echo "Try to restore WiFi"
-nmcli device set wlp2s0 managed true
+nmcli device set wlan0 managed true

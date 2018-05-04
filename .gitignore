@@ -1,2 +1,4 @@
 */__pycache__
 */*.swp
+docker-compose.yml
+start.sh
