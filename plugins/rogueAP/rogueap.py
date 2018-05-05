@@ -163,8 +163,8 @@ def save_new_ap(essid, bssid):
 
 def detect_rogueap(data, options):
 
-    essid = data['ESSID']
-    bssid = data['BSSID']
+    essid = data['wlan.ssid']
+    bssid = data['wlan.bssid']
 
     message = {
             'name': 'RogueAP',

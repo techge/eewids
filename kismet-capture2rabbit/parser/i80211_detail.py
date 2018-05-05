@@ -24,10 +24,10 @@ from elements import parse_element_fields
 
 def i80211_info(i80211, packet, off):
 
-    if (i80211['type'][1] == 'Management'):
+    if (i80211['wlan.fc.type'][1] == 'Management'):
         return management(i80211, packet, off)
 
-    if (i80211['type'][1] == 'Control'):
+    if (i80211['wlan.fc.type'][1] == 'Control'):
         return control(i80211, packet, off)
         
     return {}
@@ -37,12 +37,12 @@ def management(i80211, packet, off):
 
     elements = parse_element_fields(packet[off:])
 
-    if(i80211['subtype'][1] == 'Beacon' or 
-       i80211['subtype'][1] == 'Probe Request' or 
-       i80211['subtype'][1] == 'Probe Response'):
+    if(i80211['wlan.fc.subtype'][1] == 'Beacon' or 
+       i80211['wlan.fc.subtype'][1] == 'Probe Request' or 
+       i80211['wlan.fc.subtype'][1] == 'Probe Response'):
     
         elements.update({
-                'BSSID': i80211['addr3'],
+                'wlan.bssid': i80211['wlan.addr3'],
                 })
 
     return elements

@@ -50,7 +50,7 @@ def main(rab_host, rab_port):
 
     def callback(ch, method, properties, body):
         data = json.loads(body)
-        print(" [x] Captured %r: ESSID was %r" % (data['subtype'][1], data.get("ESSID")))
+        print(" [x] Captured %r: ESSID was %r" % (data['wlan.fc.subtype'][1], data.get("wlan.ssid")))
 
     channel.basic_consume(callback,
                           queue=queue_name,

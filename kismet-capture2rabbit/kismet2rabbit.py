@@ -33,8 +33,8 @@ def distribute(cap_info, channel):
 
     message = json.dumps(cap_info)
 
-    # routing_key is if_name.type.subtype 
-    key = cap_info['if_name'] + '.' + cap_info['type'][1] + '.' + cap_info['subtype'][1]
+    # routing_key is pcapng.if_name.type.subtype 
+    key = cap_info['pcapng.if_name'] + '.' + cap_info['wlan.fc.type'][1] + '.' + cap_info['wlan.fc.subtype'][1]
     channel.basic_publish(exchange='kismet_capture',
                           routing_key=key,
                           body=message)
@@ -84,9 +84,9 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
                 # update interface_description
                 if (block_information['block_type'][1] == 'Interface Description Block'):
                     interface_description = {
-                            'linktype': block_information['linktype'],
-                            'snaplen': block_information['snaplen'],
-                            'if_name': block_information['if_name'].decode('utf-8'),
+                            'pcapng.linktype': block_information['pcapng.linktype'],
+                            'pcapng.snaplen': block_information['pcapng.snaplen'],
+                            'pcapng.if_name': block_information['pcapng.if_name'].decode('utf-8'),
                             }
 
                 # actual packet arrived, parsing and distributing 
@@ -94,6 +94,8 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
 
                     cap_info = interface_description
                     cap_info.update(block_information)
+                    cap_info.pop('block_type')
+                    cap_info.pop('length')
                     cap_info.update(p.packet_parse(packet))
 
                     distribute(cap_info, channel)

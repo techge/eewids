@@ -471,12 +471,12 @@ def ieee80211_parse(packet, offset):
     offset += hdr_len
 
     mac = {
-        'fc': fc,
-        'protocol': int(0x3 & fc),
-        'type': frame_type[(0x3 & fc>>2)],
-        'subtype': frame_subtype[(0x30 & fc<<2) | (0xf & fc>>4)],
-        'duration': duration * .001024,
-        'addr1': macstr(addr1),
+        'wlan.fc': fc,
+        'wlan.version': int(0x3 & fc),
+        'wlan.fc.type': frame_type[(0x3 & fc>>2)],
+        'wlan.fc.subtype': frame_subtype[(0x30 & fc<<2) | (0xf & fc>>4)],
+        'wlan.duration': duration * .001024,
+        'wlan.addr1': macstr(addr1),
     }
 
     if is_blkack(mac):
@@ -489,10 +489,10 @@ def ieee80211_parse(packet, offset):
             struct.unpack_from(blkack_fmt, packet, offset)
         offset += blkack_len
         mac.update({
-            'addr2': macstr(addr2),
-            'ba_ctrl': ba_ctrl,
-            'ba_ssc': ba_ssc,
-            'ba_bitmap': ba_bitmap.hex()
+            'wlan.addr2': macstr(addr2),
+            'wlan.ba.ctrl': ba_ctrl,
+            'wlan.ba.ssc': ba_ssc,
+            'wlan.ba.bm': ba_bitmap.hex()
         })
         return offset, mac
 
@@ -505,10 +505,10 @@ def ieee80211_parse(packet, offset):
         struct.unpack_from(three_addr_fmt, packet, offset)
     offset += three_addr_len
     mac.update({
-        'addr2': macstr(addr2),
-        'addr3': macstr(addr3),
-        'seq': seq >> 4,
-        'frag': seq & 0x0f
+        'wlan.addr2': macstr(addr2),
+        'wlan.addr3': macstr(addr3),
+        'wlan.seq': seq >> 4,
+        'wlan.frag': seq & 0x0f
     })
 
     if is_qos(mac):
@@ -520,7 +520,7 @@ def ieee80211_parse(packet, offset):
         addr4, = struct.unpack_from(four_addr_fmt, packet, offset)
         offset += four_addr_len
         mac.update({
-            'addr4': macstr(addr4)
+            'wlan.addr4': macstr(addr4)
         })
 
         qos_ctrl_fmt = "<H"
@@ -535,10 +535,10 @@ def ieee80211_parse(packet, offset):
         rspi = (qos_ctrl >> 10) & 1
 
         mac.update({
-            'tid': tid,
-            'eosp': eosp,
-            'rspi': rspi,
-            'mesh_ps': mesh_ps,
+            'wlan.qos.tid': tid,
+            'wlan.qos.eosp': eosp,
+            'wlan.qos.rspi': rspi,
+            'wlan.mesh.config.cap.power_save_level': mesh_ps,
         })
 
     return offset, mac

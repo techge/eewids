@@ -83,11 +83,11 @@ def block_interface_description(stream):
     block, length, linktype, reserved, snaplen = struct.unpack_from(hdr_fmt, stream, 0)
 
     block_information = {
-        'block_type':   (1, 'Interface Description Block'),
-        'length':       length,
-        'linktype':     linktype,
-        #'reserved':     reserved,
-        'snaplen':      snaplen,
+        'block_type':       (1, 'Interface Description Block'),
+        'length':           length,
+        'pcapng.linktype':  linktype,
+        #'reserved':         reserved,
+        'pcapng.snaplen':   snaplen,
     }
 
     end_length, = struct.unpack_from("<I", stream, length - 4)
@@ -107,12 +107,12 @@ def block_interface_description(stream):
         # if_name option field
         if (code == 2):
             block_information.update({
-                'if_name': stream[optionbyte + 4:optionbyte + 4 + op_len],
+                'pcapng.if_name': stream[optionbyte + 4:optionbyte + 4 + op_len],
             })
 
         if (code == 3):
             block_information.update({
-                'if_description': stream[optionbyte + 4:optionbyte + 4 + op_len],
+                'pcapng.if_description': stream[optionbyte + 4:optionbyte + 4 + op_len],
             })
 
         # end of option fields
@@ -132,13 +132,13 @@ def block_enhanced(stream):
     block, length, iID, timeh, timel, cap_len, orig_len = struct.unpack_from(hdr_fmt, stream, 0)
     
     block_information = {
-        'block_type':           (6, 'Enhanced Packet Block'),
-        'length':               length,
-        'interface_ID':         iID, 
-        'time_high':            timeh,
-        'time_low':             timel,
-        'captured_pack_len':    cap_len,
-        'original_pack_len':    orig_len,
+        'block_type':              (6, 'Enhanced Packet Block'),
+        'length':                  length,
+        'pcapng.if_ID':            iID, 
+        'pcapng.time_high':        timeh,
+        'pcapng.time_low':         timel,
+        'pcapng.cap_pack_len':     cap_len,
+        'pcapng.orig_pack_len':    orig_len,
     }
 
     end_length, = struct.unpack_from("<I", stream, length - 4)

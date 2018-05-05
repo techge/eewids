@@ -24,14 +24,14 @@ import struct
 
 def _parse_ssid(packet, length, offset):
     if length == 0:
-        return {'ESSID': 'WILDCARD',}
+        return {'wlan.ssid': 'WILDCARD',}
     else:
         essid = (packet[offset:offset+length]).decode('utf-8', errors='replace')
-        return {'ESSID': essid,} 
+        return {'wlan.ssid': essid,} 
 
 def _parse_country(packet, length, offset):
     code = packet[offset:offset+2].decode('ascii', errors='ignore')
-    return {'country_code': code,} 
+    return {'wlan.country_info.code': code,} 
 
 def _parse_default(packet, length, offset):
     return {} 
@@ -42,9 +42,9 @@ def _parse_fixed(packet):
     ts, interval, capabilities = struct.unpack_from(hdr_fmt, packet, 0)
 
     return offset, {
-            'i80211_ts': ts,
-            'interval': interval,
-            'capabilities': capabilities,
+            'wlan.fixed.timestamp': ts,
+            'wlan.fixed.beacon': interval,
+            'wlan.fixed.capabilities': capabilities,
             }
 
 def parse_element_fields(packet):

@@ -21,14 +21,12 @@ The following table includes information which is logged for *every* frame sent 
 Key | Belonging to layer | Description of field | since version
 ----| ------------------ | -------------------- | -------------
 version | EEWIDS | Indicates the availability of fields as noted on this page | 1.0
-linktype | pcapng: [IDB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_idb) | Link layer type of the interface | 1.0
-snaplen | pcapng: [IDB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_idb) | Mmaximum number of octets captured from each packet | 1.0
-if_name | pcapng: [IDB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_idb) | The name of the device used to capture data  | 1.0
-block_type | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) |   | 1.0
-length | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) |  | 1.0
-interface_ID | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) | Interface this packet comes from | 1.0
-time_high | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) | upper 32 bits of a 64-bit timestamp | 1.0
-time_low | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) | lower 32 bits of a 64-bit timestamp  | 1.0
+pcapng.linktype | pcapng: [IDB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_idb) | Link layer type of the interface | 1.0
+pcapng.snaplen | pcapng: [IDB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_idb) | Mmaximum number of octets captured from each packet | 1.0
+pcapng.if_name | pcapng: [IDB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_idb) | The name of the device used to capture data  | 1.0
+pcapng.if_ID | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) | Interface this packet comes from | 1.0
+pcapng.time_high | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) | upper 32 bits of a 64-bit timestamp | 1.0
+pcapng.time_low | pcapng: [EPB](https://xml2rfc.tools.ietf.org/cgi-bin/xml2rfc.cgi?url=https://raw.githubusercontent.com/pcapng/pcapng/master/draft-tuexen-opsawg-pcapng.xml&modeAsFormat=html/ascii&type=ascii#section_epb) | lower 32 bits of a 64-bit timestamp  | 1.0
 TSFT | radiotap: [TSFT](http://www.radiotap.org/fields/TSFT.html) | Value in usec of the MAC’s 64-bit 802.11 Time Synchronization Function timer | 1.0
 flags | radiotap: [Flags](http://www.radiotap.org/fields/Flags.html) | Properties of transmitted and received frames | 1.0
 rate | radiotap: [Rate](http://www.radiotap.org/fields/Rate.html) | TX/RX data rate | 1.0
@@ -37,12 +35,12 @@ chan_flags | radiotap: [Channel](http://www.radiotap.org/fields/Channel.html) | 
 dbm_antsignal | radiotap: [Antenna Signal](http://www.radiotap.org/fields/dB%20antenna%20signal.html) | RF signal power at the antenna | 1.0
 rx_flags | radiotap: [RX Flags](http://www.radiotap.org/fields/RX%20flags.html) | Properties of received frames.  | 1.0
 antenna | radiotap: [Antenna](http://www.radiotap.org/fields/Antenna.html) | Unitless indication of the Rx/Tx antenna for this packet | 1.0
-fc | 80211 | Full frame control field  | 1.0
-protocol | 80211 | Protocol version (added for convenience)  | 1.0
-type | 80211 | Frame type (added for convenience)  | 1.0
-subtype | 80211 | Frame subtype (added for convenience)  | 1.0
-duration | 80211 | Duration field  | 1.0
-addr1 | 80211 | First address field  | 1.0
+wlan.fc | 80211 | Full frame control field  | 1.0
+wlan.fc.version | 80211 | Protocol version (added for convenience)  | 1.0
+wlan.fc.type | 80211 | Frame type (added for convenience)  | 1.0
+wlan.fc.subtype | 80211 | Frame subtype (added for convenience)  | 1.0
+wlan.duration | 80211 | Duration field  | 1.0
+wlan.addr1 | 80211 | First address field  | 1.0
 
 The following information is situated in the radiotap header and the presence depends on the setup (e.g. the card's and clients capabilities etc.). If it is present it will be included too.
 
@@ -61,58 +59,59 @@ Below are frame specific fields.
 
 ## Management Frames
 The following information is sent aditionally in case the captured frame was a management frame
-(type == 'Management').
+(wlan.type == 'Management') and the information was available.
 
 Key | Belonging to layer | Description of field | since version
 ----| ------------------ | -------------------- | -------------
-addr2 | 80211 | Second address field | 1.0
-addr3 | 80211 | Third address field | 1.0
-seq | 80211 | Sequence number | 1.0
-frag | 80211 | Fragment number | 1.0
+wlan.addr2 | 80211 | Second address field | 1.0
+wlan.addr3 | 80211 | Third address field | 1.0
+wlan.seq | 80211 | Sequence number | 1.0
+wlan.frag | 80211 | Fragment number | 1.0
 
-### Beacon only
-The following information is sent aditionally in case the captured frame was a Beacon frame
-(subtype == 'Beacon').
-
+### Additionall Information, availability depends on packet
 Key | Belonging to layer | Description of field | since version
 ----| ------------------ | -------------------- | -------------
-BSSID | 80211 | This is the same as 'addr3' and only for convenience | 1.0
-ESSID | 80211 | The SSID sent | 1.0
+wlan.bssid | 80211 | This is the same as 'addr3' and only for convenience | 1.0
+wlan.ssid | 80211 | The SSID sent | 1.0
+wlan.country_info.code | 80211 | 
+wlan.fixed.timestamp  | 80211 | 
+wlan.fixed.beacon | 80211 | 
+wlan.fixed.capabilities | 80211 | 
 
 ## Control Frames
 The following information is sent aditionally in case the captured frame was a Control frame
-(type == 'Control').
+(wlan.type == 'Control').
 
 ### Block Ack only
 The following information is sent aditionally in case the captured frame was a Block Ack frame
-(type == 'Control' and subtype == 'Block Ack').
+(wlan.type == 'Control' and wlan.subtype == 'Block Ack').
 
 Key | Belonging to layer | Description of field | since version
 ----| ------------------ | -------------------- | -------------
-addr2 | 80211 | Second address field  | 1.0
-ba_ctrl | 80211 | Block Ack control field  | 1.0
-ba_ssc | 80211 | Block Ack starting sequence control  | 1.0
-ba_bitmap | 80211 | Block Ack bitmap  | 1.0
+wlan.addr2 | 80211 | Second address field  | 1.0
+wlan.ba.control | 80211 | Block Ack control field  | 1.0
+wlan.ba.ssc | 80211 | Block Ack starting sequence control  | 1.0
+wlan.ba.bm | 80211 | Block Ack bitmap  | 1.0
 
 ## Data Frames
 The following information is sent aditionally in case the captured frame was a Data frame
-(type == 'Data').
+(wlan.type == 'Data').
 
 Key | Belonging to layer | Description of field | since version
 ----| ------------------ | -------------------- | -------------
-addr2 | 80211 | Second address field  | 1.0
-addr3 | 80211 | Third address field  | 1.0
-seq | 80211 | Sequence number  | 1.0
-frag | 80211 | Fragment number  | 1.0
+wlan.addr2 | 80211 | Second address field  | 1.0
+wlan.addr3 | 80211 | Third address field  | 1.0
+wlan.seq | 80211 | Sequence number  | 1.0
+wlan.frag | 80211 | Fragment number  | 1.0
 
 ### QoS data/QoS Null only
 The following information is sent aditionally in case the captured frame was a QoS data or QoS Null frame
-(type == 'Data' and (subtype == 'QoS data' or subtype == 'QoS Null').
+(wlan.type == 'Data' and (wlan.subtype == 'QoS data' or wlan.subtype == 'QoS Null').
 
 Key | Belonging to layer | Description of field | since version
 ----| ------------------ | -------------------- | -------------
-addr4 | 80211 | Forth address field | 1.0
-tid | 80211 | TID subfield | 1.0
-eosp | 80211 | End of service period (EOSP) subfield  | 1.0
-rspi | 80211 | Receiver service period initiated (RSPI) subfield  | 1.0
-mesh_ps | 80211 | Mesh power save level subfield  | 1.0
+wlan.addr4 | 80211 | Forth address field | 1.0
+wlan.qos.tid | 80211 | TID subfield | 1.0
+wlan.qos.eosp | 80211 | End of service period (EOSP) subfield  | 1.0
+wlan.qos.rspi | 80211 | Receiver service period initiated (RSPI) subfield  | 1.0
+wlan.mesh.config.cap.power_save_level | 80211 | Mesh power save level subfield  | 1.0
