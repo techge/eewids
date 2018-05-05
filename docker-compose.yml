@@ -53,12 +53,12 @@ services:
       - rabbit-server
 
   rogueap:
-    build: examples/rogueAP/
+    build: plugins/rogueAP/
     networks:
       - rabbit
     volumes:
       - type: bind
-        source: ./examples/rogueAP/lists
+        source: ./plugins/rogueAP/lists
         target: /lists
     tty: true
     stdin_open: true
