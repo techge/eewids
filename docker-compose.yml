@@ -52,7 +52,7 @@ services:
       - kismet-server
       - rabbit-server
 
-  rogueAP:
+  rogueap:
     build: examples/rogueAP/
     networks:
       - rabbit
@@ -64,6 +64,8 @@ services:
     stdin_open: true
     depends_on:
       - rabbit-server
+      - kiscap2rabbit
+      - kisale2rabbit
     entrypoint:
       - python
       - rogueap.py

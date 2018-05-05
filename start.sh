@@ -14,7 +14,7 @@ echo "starting kismet remote capture ..."
 /usr/bin/kismet_cap_linux_wifi --connect localhost:3501 --source=wlan0 &
 
 echo "attaching to example"
-docker-compose logs --follow rogueAP
+docker-compose logs --follow rogueap
 
 echo "killing everything :)"
 docker-compose down
