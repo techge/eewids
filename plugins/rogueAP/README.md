@@ -1,99 +1,98 @@
 # Rogue Access Point Detection
 
+```
+usage: rogueap.py [-h] [--rabbit_host HOST] [--rabbit_port PORT]
+                  [--alert | --train] [--info]
+
+Rogue access point detection for Eewids. Store your whitelist.yml and/or
+blacklist.yml in folder 'lists', if needed.
+
+optional arguments:
+  -h, --help          show this help message and exit
+  --rabbit_host HOST  Host of RabbitMQ server
+  --rabbit_port PORT  Port of RabbitMQ server
+  --alert             Send alerts for access points not on whitelist (instead
+                      of warnings). Note that blacklist members will always
+                      provoke an alert. Thus, this option is for whitelist
+                      enforcement and this option can not get combined with
+                      --train.
+  --train             Create/use knownAP.yml of already seen access points. If
+                      this flag is used, only access points never seen before
+                      provoke a warning.
+  --info              Send info instead of warning. Blacklist members will
+                      always provoke an alert though.
+```
+
 * [Characteristics](#characteristics)
 * [General Approach](#general-approach)
   * [Black and Whitelists](#black-and-whitelists)
-  * [How Lists are Used](#how-lists-are-used)
   * [knownAP](#knownap)
-* [Hearing Map](#hearing-map)
+* [Fields of Log Messages](#fields-of-log-messages)
 * [Problem: Detecting Two APs with Similar ESSID/BSSID Combination Within Allowed Range](#problem-detecting-two-aps-with-similar-essidbssid-combination-within-allowed-range)
-
-Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 ## Characteristics
 
 * scalable (it does not make any difference, if one service sees all or just one frame, therefore multiple workers can get started based on load)
-* shared storage needed to allow scalability (see [configuration](#how-lists-are-used), e.g. a knownAP list is saved)
-* needs network connection to: RabbitMQ
+* shared storage needed to allow scalability, e.g. for saving/using a knownAP list
+* needs network connection to: 
+  * RabbitMQ
 
 ## General Approach
 
 The service for rogue access point detection looks for new/forbidden ESSIDs or ESSID/BSSID combinations seen by the remote capture. Alerts, warnings or infos are published consequently.
 
-This service is called rogue access point detection, although this might be misleading as rogue AP is often referred to a WiFi AP connected to a secure network (see the wikipedia [article](https://en.wikipedia.org/wiki/Rogue_access_point)). However this tool is maybe more about finding ["evil twins"](https://en.wikipedia.org/wiki/Evil_twin_(wireless_networks)) or [honeypots](https://en.wikipedia.org/wiki/Honeypot_(computing)) which are indeed "rogue" access points within a organization. In a way it serves as a rogue AP detection in the classic meaning too, as one can detect every not authorized AP around.
+This service is called rogue access point detection, although this might be misleading as rogue AP is often referred to a WiFi AP connected to a secure network (see the wikipedia [article](https://en.wikipedia.org/wiki/Rogue_access_point)). However this tool is maybe more about finding ["evil twins"](https://en.wikipedia.org/wiki/Evil_twin_(wireless_networks)) or [honeypots](https://en.wikipedia.org/wiki/Honeypot_(computing)) which are indeed "rogue" access points within an organization. In a way it serves as a rogue AP detection in the classic meaning too, as one can detect every not authorized AP around.
 
 ### Black and Whitelists
 
 *Blacklists* are list of forbidden ESSIDs. There is no use in blacklisting BSSIDs as well, as differenciating between allowed BSSIDs should be done in white lists.
 
-*Whitelists* are mappings of ESSIDs to a list of BSSIDs. Such, if a ESSID is on the allowed list, but the BSSID is not, this AP is not allowed. It is recommended to put ESSIDs of the whitelist on the blacklist, to ensure that every usage of this ESSID without allowed BSSID provokes an alert.
+*Whitelists* are mappings of ESSIDs to a list of BSSIDs. Such, if a ESSID is on the allowed list, but the BSSID is not, this AP is not allowed. It is recommended to put ESSIDs of the whitelist on the blacklist as well, to ensure that every usage of this ESSID without allowed BSSID provokes an alert.
 
-Both, black- and whitelists are yaml formatted text files. They are expected to be in lists/whitelist.yml and lists/blacklist.yml.
+The Whitelist is organized as a hearing map, to ensure that only ESSID/BSSID combinations are allowed, which make sense regarding the physical location of a remote capture. Otherwise an attacker could use a valid ESSID/BSSID combination seen in an other room or building and use this to not get detected (see below for an example).
 
-Whitelists are scalars mapped to sequences, such as:
+Both, black- and whitelists are yaml formatted text files. They are expected to be in the folder lists/whitelist.yml and lists/blacklist.yml.
+
+Whitelists are scalars (ESSIDs) mapped to sequences (BSSIDs) which are mapped to sequences (interfaces), such as:
 
 ```
-"ESSID1":
-- BSSID1
-"ESSID2":
-- BSSID2
-- BSSID3
+'ESSID1':
+  'BSSID1':
+  - 'AP1'
+'ESSID2':
+  'BSSID2':
+  - 'AP1'
+  - 'AP2'
+  'BSSID3':
+  - 'AP3'
 ...
 ```
 
-Blacklists are just sequences, such as:
+Blacklists are just sequences of ESSIDs, such as:
 ```
 - "ESSID1"
 - "ESSID2"
 ```
 
-### How Lists are Used 
-
-* Blacklist in use only
-  * -> Alert if BSSID in black list was seen 
-* Whitelist in use only 
-  * -> warn if ESSID/BSSID is not on whitelist and save to knownAP (if option --train is used)
-  * -> alert if ESSID/BSSID is not on whitelist (if option --alert is used)
-  * -> info if ESSID/BSSID is not on whitelist (if option --info is used) and save to knownAP (if option --train is used)
-* Black- and whitelist in use
-  * -> warn if ESSID/BSSID is not on whitelist and save to knownAP (if option --train is used)
-  * -> alert if BSSID in on blacklist **and** ESSID/BSSID is not on whitelist
-  * -> info if ESSID/BSSID is not on whitelist (if option --info is used) and save to knownAP (if option --train is used)
-* Neither blacklist nor whitelist in use
-  * -> warn if ESSID/BSSID is not on knownAP (if existence) and save to knownAP (if option --train is used)
-  * -> info if ESSID/BSSID is not on knownAP (if existence; if option --info is used) and save to knownAP (if option --train is used)
-  * -> alert if ESSID/BSSID is not on knownAP (if existence; if option --alert is used)
-
-![Flowchart of rogueAP detection in combination with lists](flowchart.png)
-
 ### knownAP
 
-Depending on the configuration new APs are saved to a lists/knownAP.yml file. This is formatted the same way like a whitelist. Thus, it could be used after some time as a whitelist (training data).
+Depending on the configuration new APs are saved to lists/knownAP.yml file. This is formatted the same way like a whitelist. Thus, it can be used after some time as a whitelist (training data, see option --train). It can be used to prevent that a unknown AP got mentioned multiple times as well.
 
-## Hearing Map
-**TODO** -> Kismet's pcap-ng output does not give the needed information for making/using hearing maps yet
+## Fields of Log Messages
 
-It is possible to add a hearing map instead of a whitelist, to ensure that only ESSID/BSSID combinations are allowed, which make sense regarding the physical location of a remote capture. Otherwise an attacker could use a valid ESSID/BSSID combination seen in an other room or building and use this to not get detected.
-
-Such a hearing map is stored in a yaml file and follows this layout:
-
-```
-'ESSID1':
-  - 'BSSID1':
-      - 'AP1'
-'ESSID2':
-  - 'BSSID2'
-      - 'AP1'
-      - 'AP2'
-  - 'BSSID3'
-      - 'AP3'
-```
-
-Such a file layout can be created instead of a knownAP list to use training data as a hearing map afterwards (see [list usage](#how-lists-are-used) and [knownAP](#knownap)).
+Key | Description of field | since version
+----| -------------------- | -------------
+version | Indicates the availability of fields as noted on this page | 1.0
+name | Alert name | 1.0
+text | Alert text | 1.0
+reason | Reason for the message [alert|blacklist] | 1.0
+essid | SSID of captured frame | 1.0
+bssid | BSSID of captured frame | 1.0
+interface | Name of interface which captured data | 1.0
 
 ## Problem: Detecting Two APs with Similar ESSID/BSSID Combination Within Allowed Range 
 **TODO**
 
-* if the allowed AP is seeing the packages itself, without sending them?
+* find out, if a AP is seeing the packages itself, although not sending them?
 * signal strength comparing?
 

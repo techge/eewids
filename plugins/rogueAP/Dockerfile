@@ -7,4 +7,4 @@ COPY rogueap.py .
 
 RUN mkdir lists
 
-CMD ["python","rogueap.py"]
+CMD ["python","rogueap.py","--train"]

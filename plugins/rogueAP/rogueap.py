@@ -117,13 +117,16 @@ def write_yml(path, data):
         f.close()
 
 
-def on_whitelist(essid, bssid):
+def on_whitelist(essid, bssid, if_name):
 
     aps = load_yml("lists/whitelist.yml")
 
+# TODO don't see why we shouldn't test at once (last if-clause)
+# probably fails, if essid not in there -> maybe there is still a more elegant way
     if aps.get(essid): # essid exists in list
         if bssid in aps[essid]:
-            return True 
+            if if_name in aps[essid][bssid]:
+                return True 
 
     return False
 
@@ -137,9 +140,9 @@ def on_blacklist(essid):
     return False
 
 
-def save_new_ap(essid, bssid):
+def save_new_ap(essid, bssid, if_name):
     """
-    Saves ESSID:BSSID combination to knownAP.yml file.
+    Saves ESSID:BSSID:if_name combination to knownAP.yml file.
     
     Returns True if new AP was seen and saved.
     Returns False if AP was already known.
@@ -150,12 +153,18 @@ def save_new_ap(essid, bssid):
     # check existence
     if aps.get(essid): # essid exists in list
         if bssid in aps[essid]:
-            return False 
+            if if_name in aps[essid][bssid]:
+                return False 
+            else:
+                aps[essid][bssid].append(if_name)   # add if_name
         else:
-            aps[essid].append(bssid) # add bssid
+            aps[essid].update({bssid: [if_name],})  # add bssid,if_name
     else:
-        aps.update({essid: [bssid],}) # add essid/bssid
+        aps.update({essid: {bssid: [if_name],},})   # add essid,bssid,if_name
+        # TODO Is this working for every three cases? Is it overriding anything?
 
+#TODO this is not save for multi-container! load and update in one step;
+# ensure idem potence!
     write_yml("lists/knownAP.yml", aps)
 
     return True
@@ -165,13 +174,18 @@ def detect_rogueap(data, options):
 
     essid = data['wlan.ssid']
     bssid = data['wlan.bssid']
+    if_name = data['pcapng.if_name']
 
     message = {
+            'version': '1.0',
             'name': 'RogueAP',
             'text': 'Access point (%s - %s)' % (essid, bssid),
+            'essid': essid,
+            'bssid': bssid,
+            'interface': if_name,
             }
 
-    if on_whitelist(essid, bssid):
+    if on_whitelist(essid, bssid, if_name):
 
         return None, None
 
@@ -181,7 +195,7 @@ def detect_rogueap(data, options):
         message.update({'reason': 'blacklist',})
         return 'alert', message
     
-    message['text'] = message['text'] + ' unknown'
+    message['text'] = message['text'] + ' unknown to ' + if_name
     message.update({'reason': 'unknown',})
 
     # if option '--alert' is used, we don't care about knownAPs!
@@ -191,7 +205,7 @@ def detect_rogueap(data, options):
     # save new APs if not on knownAP list
     if options.get('train'):
 
-        if not save_new_ap(essid, bssid): # AP already known
+        if not save_new_ap(essid, bssid, if_name): # AP already known
             return None, None
 
     # send message
@@ -249,6 +263,9 @@ def main(rab_host, rab_port, options):
     send_channel = connection.channel()
 
     # create queue and bind topics based on choosen types
+    # TODO I think you may should check if already existence
+    # I don't know for sure, if binding routing keys for 
+    # already existing queue is a problem
     queue_bindings(recv_channel, 'rogueap', 'kismet_capture')
 
     def callback(ch, method, properties, body):
