@@ -67,7 +67,7 @@ def block_section_header(stream):
         'minor_ver':    min_ver,
     }
 
-    # TODO read option fields (not used by Kismet though)
+    # TODO read option fields
 
     end_length, = struct.unpack_from("<I", stream, length - 4)
     if (length != end_length):
@@ -98,7 +98,7 @@ def block_interface_description(stream):
     optionbyte = 16
 
     # processing option fields
-    # TODO there are a lot more option fields, but they does not seem to be used by Kismet
+    # TODO there are a lot more option fields, but they are not used by Kismet
     # -> ignoring for now
     while (optionbyte < length - 4):
         

@@ -2,26 +2,38 @@ FROM debian:stretch-slim as builder
 
 # Install necessary packages for building
 RUN apt-get update && apt-get install -y \
+    autoconf \
     build-essential \
     git \
+    gdb \
+    gdbserver \
     libcap-dev \
     libdw-dev \
+    libfftw3-3 \
     libmicrohttpd-dev \
     libncurses5-dev \
     libnl-3-dev \
     libnl-genl-3-dev \
     libnm-dev \
     libpcap-dev \
+    librtlsdr0 \
     libsqlite3-dev \
+    libmicrohttpd-dev \
     libprotobuf-dev \
     libprotobuf-c-dev \
+    pkg-config \
     protobuf-compiler \
-    protobuf-c-compiler
+    protobuf-c-compiler \
+    #python \
+    #python-setuptools \
+    #python-pip \
+    unzip \
+    zlib1g-dev
 
 # Clone git repo and build kismet
-RUN git clone https://github.com/kismetwireless/kismet.git && \
-    cd kismet && \
-    git reset --hard c4d58f035977f99480c0ad99fdb60642b208bf3e && \
+RUN git clone https://github.com/kismetwireless/kismet.git /opt/kismet && \
+    cd /opt/kismet && \
+    git reset --hard 8c60b1afeefb4a5971b4cb677716ec2bc6de7e4e && \
     ./configure --disable-python-tools && \
     make -j4 && \
     make install
@@ -70,17 +82,16 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=builder /usr/local/ /usr/local/
 
-# Add user 'kismet' to group kismet
-RUN groupadd -r kismet && useradd -m -g kismet kismet 
 
-# One should not start kismet as root user
+# Start Kismet with user privileges
+RUN useradd -m kismet 
 USER kismet 
 
+# Add config files
 ADD kismet.conf /usr/local/etc/
 ADD kismet_httpd.conf /home/kismet/.kismet/
 
-ENTRYPOINT ["/usr/local/bin/kismet"]
-
+CMD ["/usr/local/bin/kismet", "--no-ncurses"]
 
 EXPOSE 2501
 EXPOSE 3501

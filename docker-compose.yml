@@ -17,7 +17,7 @@ services:
       - rabbit 
 
   kiscap2rabbit:
-    image: eewids/kiscap2rabbit
+    build: main/kismet-capture2rabbit 
     networks:
       - kismet
       - rabbit 
@@ -35,7 +35,7 @@ services:
       - rabbit-server
 
   kisale2rabbit:
-    image: eewids/kisale2rabbit
+    build: main/kismet-alert2rabbit
     networks:
       - kismet
       - rabbit
@@ -71,6 +71,16 @@ services:
       - rogueap.py
       - --train
       - --info
+
+  logprint:
+    build: plugins/logprint
+    networks:
+      - rabbit
+    tty: true
+    stdin_open: true
+    depends_on:
+      - rabbit-server
+      - kisale2rabbit
 
 
 networks:

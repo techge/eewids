@@ -45,7 +45,7 @@ def main(rab_host, rab_port):
 
     def callback(ch, method, properties, body):
         data = json.loads(body)
-        print("Alert arrived: %r %r" % (data['name'], data['text']))
+        print("Message arrived: App %r: %r" % (data['name'], data['text']))
         print(data)
 
     channel.basic_consume(callback,
