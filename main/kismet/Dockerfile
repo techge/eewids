@@ -26,21 +26,18 @@ RUN apt-get update && apt-get install -y \
     protobuf-c-compiler \
     #python \
     #python-setuptools \
-    #python-pip \
+    #python-protobuf \
+    #python-sqlite \
+    #python-requests \
     unzip \
     zlib1g-dev
-
-# Add groupd kismet with id 315
-# We will create a similiar group on resulting container below
-#RUN groupadd -r -g 315 kismet
 
 # Clone git repo and build kismet
 RUN git clone https://github.com/kismetwireless/kismet.git /opt/kismet && \
     cd /opt/kismet && \
-    ./configure --disable-python-tools --with-suidgroup=315 && \
-    make -j4 && \
-    make suidinstall && \
-    make forceconfigs
+    ./configure --disable-python-tools && \
+    make && \
+    make install
 
 ########################################################################
 # Start from official Debian Stretch-slim image 
@@ -85,14 +82,21 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=builder /usr/local/ /usr/local/
 
-# Add user 'kismet' to group kismet
-RUN groupadd -r -g 315 kismet && useradd -m -g kismet kismet 
+# Create user 'kismet' and add to new group kismet
+RUN groupadd -r kismet && useradd -m -g kismet kismet 
 
-# Start as Kismet user, instead of root
-USER kismet 
+# Make capture binaries setuid, so that user kismet can start them
+RUN chmod u=rsx,g=rx,o-rwx /usr/local/bin/kismet_cap_linux_wifi && \
+    chown :kismet /usr/local/bin/kismet_cap_linux_wifi && \
+    chmod u=rsx,g=rx,o-rwx /usr/local/bin/kismet_cap_linux_bluetooth && \
+    chown :kismet /usr/local/bin/kismet_cap_linux_bluetooth
 
 ADD kismet.conf /usr/local/etc/
 ADD kismet_httpd.conf /home/kismet/.kismet/
+ADD kismet_httpd.conf /root/.kismet/
+
+# TODO Start as Kismet user, instead of root
+#USER kismet
 
 CMD ["/usr/local/bin/kismet", "--no-ncurses"]
 
