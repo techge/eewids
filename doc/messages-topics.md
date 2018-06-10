@@ -9,12 +9,12 @@ This page tracks all information for topic exchange 'messages', where every appl
 
 An application can create a RabbitMQ queue and bind it to the 'messages' exchange by using various routing keys. Every application can publish or subscribe to information like warnings, errors etc. on the message broker by using the following routing key scheme:
 
-    <service>.<messageType>
+    <service>.<loglevel>
 
-'service' is the name of the application which publishs a message, e.g. 'kismet-server', 'kismet2rabbit' or alike. 'messageType' is one of the follwing: 
+'service' is the name of the application which publishs a message, e.g. 'kismet-server', 'kismet2rabbit' or alike. 'loglevel' is one of the follwing: 
 
 * info
 * warning
 * error
 * alert
-* fatal
+* critical
