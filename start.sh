@@ -39,9 +39,18 @@ then
     echo "docker-compose up -d ..."
     docker-compose up -d
 
+    echo
+    echo ######################################################################
+    echo you could now connect your source to the kismet server via
+    echo /usr/bin/kismet_cap_linux_wifi --connect localhost:3501 --source=wlan0
+    echo or alike ...
+    echo
+    echo Afterwards, connect to http://localhost:3000 and 
+    echo login with admin:admin
+    echo ######################################################################
+    echo
+
     docker-compose logs --follow logprint
-    # you could now connect to the kismet server via
-    # /usr/bin/kismet_cap_linux_wifi --connect localhost:3501 --source=wlan0
 
     echo "killing everything now :)"
     docker-compose down
@@ -58,6 +67,7 @@ else
     # https://github.com/kismetwireless/kismet/blob/master/packaging/docker/
     PHY=$(cat /sys/class/net/"$1"/phy80211/name)
     PID=$(docker container inspect -f '{{.State.Pid}}' eewids_kismet-server_1)
+    echo "iw phy $PHY set netns $PID"
     iw phy "$PHY" set netns "$PID"
 
     docker-compose logs --follow logprint

@@ -16,6 +16,11 @@
   "gnetId": null,
   "graphTooltip": 0,
   "links": [],
+  "originalTemplating": [],
+  "originalTime": {
+    "from": "now-5m",
+    "to": "now"
+  },
   "panels": [
     {
       "aliasColors": {},
@@ -23,6 +28,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Eewids",
+      "description": "Content of duration field in CTS frames. A unusual high value indicates a CTS DoS attack.",
       "fill": 1,
       "gridPos": {
         "h": 9,
@@ -32,13 +38,14 @@
       },
       "id": 2,
       "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
+        "alignAsTable": false,
+        "avg": true,
+        "current": true,
+        "max": true,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -46,7 +53,7 @@
       "nullPointMode": "null",
       "percentage": false,
       "pointradius": 5,
-      "points": false,
+      "points": true,
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
@@ -87,13 +94,19 @@
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "wlan.fc.subtype.str",
+              "operator": "=",
+              "value": "RTS"
+            }
+          ]
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Panel Title",
+      "title": "Duration Field of CTS frames",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -109,20 +122,20 @@
       },
       "yaxes": [
         {
-          "format": "short",
-          "label": null,
+          "format": "µs",
+          "label": "Duration Field",
           "logBase": 1,
           "max": null,
           "min": null,
           "show": true
         },
         {
-          "format": "short",
+          "format": "µs",
           "label": null,
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -148,7 +161,7 @@
       "legend": {
         "alignAsTable": false,
         "avg": true,
-        "current": false,
+        "current": true,
         "max": true,
         "min": false,
         "rightSide": false,
@@ -162,7 +175,7 @@
       "nullPointMode": "null",
       "percentage": false,
       "pointradius": 5,
-      "points": false,
+      "points": true,
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
@@ -203,7 +216,13 @@
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "wlan.fc.subtype.str",
+              "operator": "=",
+              "value": "RTS"
+            }
+          ]
         }
       ],
       "thresholds": [],
@@ -261,6 +280,7 @@
     "to": "now"
   },
   "timepicker": {
+    "nowDelay": "",
     "refresh_intervals": [
       "5s",
       "10s",
@@ -286,7 +306,7 @@
     ]
   },
   "timezone": "",
-  "title": "Wlan duration fields distinct",
+  "title": "Duration fields distinct RTS/CTS frames",
   "uid": "C3gdxgSmz",
-  "version": 2
+  "version": 1
 }

@@ -16,7 +16,6 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
   "links": [],
   "originalTemplating": [],
   "originalTime": {
@@ -87,7 +86,7 @@
               "type": "tag"
             }
           ],
-          "measurement": "kismet_capture_deauth",
+          "measurement": "kismet_capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "B",
@@ -96,13 +95,19 @@
             [
               {
                 "params": [
-                  "wlan.duration"
+                  "chan_freq"
                 ],
                 "type": "field"
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "wlan.fc.subtype.str",
+              "operator": "=",
+              "value": "Deauthentication"
+            }
+          ]
         }
       ],
       "title": "Table with Addresses",
@@ -161,7 +166,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "kismet_capture_deauth",
+          "measurement": "kismet_capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -180,7 +185,13 @@
               }
             ]
           ],
-          "tags": []
+          "tags": [
+            {
+              "key": "wlan.fc.subtype.str",
+              "operator": "=",
+              "value": "Deauthentication"
+            }
+          ]
         }
       ],
       "thresholds": [],
@@ -263,5 +274,5 @@
   "timezone": "",
   "title": "Deauthentication Frames",
   "uid": "C3gdxgSmy",
-  "version": 3
+  "version": 2
 }

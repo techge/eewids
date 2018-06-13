@@ -34,7 +34,7 @@ def distribute(cap_info, channel):
     message = json.dumps(cap_info)
 
     # routing_key is pcapng.if_name.type.subtype 
-    key = cap_info['pcapng.if_name'] + '.' + cap_info['wlan.fc.type'][1] + '.' + cap_info['wlan.fc.subtype'][1]
+    key = cap_info['pcapng.if_name'] + '.' + cap_info['wlan.fc.type.str'] + '.' + cap_info['wlan.fc.subtype.str']
     channel.basic_publish(exchange='kismet_capture',
                           routing_key=key,
                           body=message)

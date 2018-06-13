@@ -129,8 +129,6 @@ services:
       - ./etc/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./etc/grafana/provisioning:/etc/grafana/provisioning
       - ./etc/grafana/dashboards:/etc/grafana/dashboards
-        # the following is temporary and based on #12136 of grafana
-      - ./query_ctrl.ts:/usr/share/grafana/public/app/plugins/datasource/influxdb/query_ctrl.ts
     depends_on:
       - influxdb
     networks:
