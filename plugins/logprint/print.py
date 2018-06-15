@@ -34,7 +34,8 @@ def main(rab_host, rab_port):
     channel = connection.channel()
 
     channel.exchange_declare(exchange='messages',
-                             exchange_type='topic')
+                             exchange_type='topic',
+                             durable=True,)
 
     result = channel.queue_declare(exclusive=True)
     queue_name = result.method.queue
@@ -49,8 +50,7 @@ def main(rab_host, rab_port):
         print(data)
 
     channel.basic_consume(callback,
-                          queue=queue_name,
-                          no_ack=True)
+                          queue=queue_name,)
 
     print(' [*] Waiting for messages. To exit press CTRL+C')
     channel.start_consuming()

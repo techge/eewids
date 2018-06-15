@@ -26,7 +26,7 @@ def _parse_ssid(packet, length, offset):
     if length == 0:
         return {'wlan.ssid': 'WILDCARD',}
     else:
-        essid = (packet[offset:offset+length]).decode('utf-8', errors='replace')
+        essid = (packet[offset:offset+length]).decode('utf-8', errors='ignore')
         return {'wlan.ssid': essid,} 
 
 def _parse_country(packet, length, offset):

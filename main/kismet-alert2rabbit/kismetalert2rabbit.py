@@ -33,6 +33,7 @@ def distribute(data, channel):
     # convert name and text to EEWIDS format
     data['name'] = data.pop("kismet.alert.header")
     data['text'] = data.pop("kismet.alert.text")
+    data.update({'loglevel': 'alert',})
 
     message = json.dumps(data)
 
@@ -56,7 +57,8 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
 
     channel = connection.channel()
     channel.exchange_declare(exchange='messages',
-                             exchange_type='topic')
+                             exchange_type='topic',
+                             durable=True,)
 
     # we need to request alerts periodically
     # using 'sched' Event Scheduler to request every 10 seconds

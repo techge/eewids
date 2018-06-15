@@ -192,7 +192,10 @@ def detect_rogueap(data, options):
     if on_blacklist(essid):
 
         message['text'] = message['text'] + ' on blacklist!'
-        message.update({'reason': 'blacklist',})
+        message.update({
+            'reason': 'blacklist',
+            'loglevel': 'alert',
+            })
         return 'alert', message
     
     message['text'] = message['text'] + ' unknown to ' + if_name
@@ -200,6 +203,7 @@ def detect_rogueap(data, options):
 
     # if option '--alert' is used, we don't care about knownAPs!
     if options.get('alert'):
+        message.update({'loglevel': 'alert',})
         return 'alert', message
 
     # save new APs if not on knownAP list
@@ -210,21 +214,23 @@ def detect_rogueap(data, options):
 
     # send message
     if options.get('info'):
+        message.update({'loglevel': 'info',})
         return 'info', message
     else:
+        message.update({'loglevel': 'warning',})
         return 'warning', message
 
 
-def send_message(messagetype, message_cont, send_channel):
+def send_message(loglevel, message_cont, send_channel):
 
     message = json.dumps(message_cont)
-    key = 'rogueap.' + messagetype
+    key = 'rogueap.' + loglevel
 
     send_channel.basic_publish(exchange='messages',
                                routing_key=key,
                                body=message)
     
-    print(" [x] %r %r sent." % (messagetype, message_cont['text']))
+    print(" [x] %r %r sent." % (loglevel, message_cont['text']))
 
 
 def queue_bindings(channel, queue_name, exch):
@@ -262,6 +268,10 @@ def main(rab_host, rab_port, options):
     # open channel to publish alerts
     send_channel = connection.channel()
 
+    send_channel.exchange_declare(exchange='messages',
+                                  exchange_type='topic',
+                                  durable=True,)
+
     # create queue and bind topics based on choosen types
     # TODO I think you may should check if already existence
     # I don't know for sure, if binding routing keys for 
@@ -272,10 +282,10 @@ def main(rab_host, rab_port, options):
 
         # data arrived start the detection
         data = json.loads(body)
-        messagetype, message_cont = detect_rogueap(data, options)
+        loglevel, message_cont = detect_rogueap(data, options)
 
-        if messagetype is not None:
-            send_message(messagetype, message_cont, send_channel)
+        if loglevel is not None:
+            send_message(loglevel, message_cont, send_channel)
 
     recv_channel.basic_consume(callback,
                                queue='rogueap',
