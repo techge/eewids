@@ -58,29 +58,31 @@ services:
     depends_on:
       - kismet-server
       - rabbit-server
+    restart: on-failure
 
 #############
 ## Plugins ##
 #############
-        #  rogueap:
-        #    build: plugins/rogueAP/
-        #    networks:
-        #      - rabbit
-        #    volumes:
-        #      - type: bind
-        #        source: ./plugins/rogueAP/lists
-        #        target: /lists
-        #    tty: true
-        #    stdin_open: true
-        #    depends_on:
-        #      - rabbit-server
-        #      - kiscap2rabbit
-        #      - kisale2rabbit
-        #    entrypoint:
-        #      - python
-        #      - rogueap.py
-        #      - --train
-        #      - --info
+  rogueap:
+    build: plugins/rogueAP/
+    networks:
+      - rabbit
+    volumes:
+      - type: bind
+        source: ./plugins/rogueAP/lists
+        target: /lists
+    tty: true
+    stdin_open: true
+    depends_on:
+      - rabbit-server
+      - kiscap2rabbit
+      - kisale2rabbit
+    entrypoint:
+      - python
+      - rogueap.py
+      - --train
+      - --info
+    restart: on-failure
 
   logprint:
     build: plugins/logprint

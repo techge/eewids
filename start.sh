@@ -49,10 +49,13 @@ then
     echo login with admin:admin
     echo ######################################################################
     echo
-
+    echo Press Ctrl-c to end Eewids
+    echo
     docker-compose logs --follow logprint
 
+    echo
     echo "killing everything now :)"
+    echo
     docker-compose down
 
 else
