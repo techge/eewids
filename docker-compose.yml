@@ -16,6 +16,7 @@ services:
       - "3501:3501"
     tty: true
     stdin_open: true
+    restart: always
 
   rabbit-server:
     image: rabbitmq
@@ -58,7 +59,7 @@ services:
     depends_on:
       - kismet-server
       - rabbit-server
-    restart: on-failure
+    restart: always
 
 #############
 ## Plugins ##
@@ -69,7 +70,7 @@ services:
       - rabbit
     volumes:
       - type: bind
-        source: ./plugins/rogueAP/lists
+        source: ./data/rogueAP
         target: /lists
     tty: true
     stdin_open: true
@@ -93,6 +94,7 @@ services:
     depends_on:
       - rabbit-server
       - kisale2rabbit
+    restart: always
 
 
 ###################

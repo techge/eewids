@@ -36,9 +36,11 @@ dbm_antsignal | radiotap: [Antenna Signal](http://www.radiotap.org/fields/dB%20a
 rx_flags | radiotap: [RX Flags](http://www.radiotap.org/fields/RX%20flags.html) | Properties of received frames.  | 1.0
 antenna | radiotap: [Antenna](http://www.radiotap.org/fields/Antenna.html) | Unitless indication of the Rx/Tx antenna for this packet | 1.0
 wlan.fc | 80211 | Full frame control field  | 1.0
-wlan.fc.version | 80211 | Protocol version (added for convenience)  | 1.0
-wlan.fc.type | 80211 | Frame type (added for convenience)  | 1.0
-wlan.fc.subtype | 80211 | Frame subtype (added for convenience)  | 1.0
+wlan.fc.version | 80211 | Protocol version | 1.0
+wlan.fc.type | 80211 | Frame type | 1.0
+wlan.fc.type.str | 80211 | Frame type (human-readable string, see [here](/doc/kismet_capture-topics.md#frame-types-subtypes))  | 1.0
+wlan.fc.subtype | 80211 | Frame subtype | 1.0
+wlan.fc.subtype.str | 80211 | Frame subtype (human-readable string, see [here](/doc/kismet_capture-topics.md#frame-types-subtypes))  | 1.0
 wlan.duration | 80211 | Duration field  | 1.0
 wlan.addr1 | 80211 | First address field  | 1.0
 

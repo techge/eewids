@@ -23,13 +23,6 @@ optional arguments:
                       always provoke an alert though.
 ```
 
-* [Characteristics](#characteristics)
-* [General Approach](#general-approach)
-  * [Black and Whitelists](#black-and-whitelists)
-  * [knownAP](#knownap)
-* [Fields of Log Messages](#fields-of-log-messages)
-* [Problem: Detecting Two APs with Similar ESSID/BSSID Combination Within Allowed Range](#problem-detecting-two-aps-with-similar-essidbssid-combination-within-allowed-range)
-
 ## Characteristics
 
 * scalable (it does not make any difference, if one service sees all or just one frame, therefore multiple workers can get started based on load)
@@ -85,14 +78,7 @@ Key | Description of field | since version
 version | Indicates the availability of fields as noted on this page | 1.0
 name | Alert name | 1.0
 text | Alert text | 1.0
-reason | Reason for the message [alert|blacklist] | 1.0
+reason | Reason for the message ('unknown' or 'blacklist') | 1.0
 essid | SSID of captured frame | 1.0
 bssid | BSSID of captured frame | 1.0
 interface | Name of interface which captured data | 1.0
-
-## Problem: Detecting Two APs with Similar ESSID/BSSID Combination Within Allowed Range 
-**TODO**
-
-* find out, if a AP is seeing the packages itself, although not sending them?
-* signal strength comparing?
-
