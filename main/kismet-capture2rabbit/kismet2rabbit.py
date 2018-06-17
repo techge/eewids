@@ -35,7 +35,7 @@ def distribute(cap_info, channel):
 
     # routing_key is pcapng.if_name.type.subtype 
     key = cap_info['pcapng.if_name'] + '.' + cap_info['wlan.fc.type.str'] + '.' + cap_info['wlan.fc.subtype.str']
-    channel.basic_publish(exchange='kismet_capture',
+    channel.basic_publish(exchange='capture',
                           routing_key=key,
                           body=message)
 
@@ -59,7 +59,7 @@ def main(kis_host, kis_port, kis_user, kis_pass, rab_host, rab_port):
     connection = pika.BlockingConnection(ConnectionParameters)
 
     channel = connection.channel()
-    channel.exchange_declare(exchange='kismet_capture',
+    channel.exchange_declare(exchange='capture',
                              exchange_type='topic',
                              durable=True,)
 

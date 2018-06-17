@@ -98,7 +98,7 @@ def detect_attack(data, send_channel):
     # TODO
     # This is the main part you have to think about. Here is your main code.
     # data is a python dictionary which contains all fields described on
-    # https://github.com/techge/eewids/blob/master/docs/rabbitmq/kismet_capture-fields.md
+    # https://github.com/techge/eewids/blob/master/docs/rabbitmq/capture-fields.md
     # TODO
 
     if detected:
@@ -147,9 +147,9 @@ def main(rab_host, rab_port):
                                                      connection_attempts=10)
     connection = pika.BlockingConnection(ConnectionParameters)
 
-    # open channel to consume kismet capture
+    # open channel to consume capture
     recv_channel = connection.channel()
-    recv_channel.exchange_declare(exchange='kismet_capture',
+    recv_channel.exchange_declare(exchange='capture',
                                   exchange_type='topic')
 
     # open channel to publish alerts
@@ -165,7 +165,7 @@ def main(rab_host, rab_port):
     for frametype in type_table:
 
         routing_key = '*.' + frametype + '.*'
-        recv_channel.queue_bind(exchange='kismet_capture',
+        recv_channel.queue_bind(exchange='capture',
                            queue=queue_name,
                            routing_key=key)
 
@@ -173,7 +173,7 @@ def main(rab_host, rab_port):
     for framesubtype in subtype_table:
 
         key = '*.*.' + framesubtype 
-        recv_channel.queue_bind(exchange='kismet_capture',
+        recv_channel.queue_bind(exchange='capture',
                            queue=queue_name,
                            routing_key=key)
 

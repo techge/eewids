@@ -276,7 +276,7 @@ def main(rab_host, rab_port, options):
     # TODO I think you may should check if already existence
     # I don't know for sure, if binding routing keys for 
     # already existing queue is a problem
-    queue_bindings(recv_channel, 'rogueap', 'kismet_capture')
+    queue_bindings(recv_channel, 'rogueap', 'capture')
 
     def callback(ch, method, properties, body):
 

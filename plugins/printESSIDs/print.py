@@ -33,7 +33,7 @@ def main(rab_host, rab_port):
     connection = pika.BlockingConnection(ConnectionParameters)
     channel = connection.channel()
 
-    channel.exchange_declare(exchange='kismet_capture',
+    channel.exchange_declare(exchange='capture',
                              exchange_type='topic')
 
     result = channel.queue_declare(exclusive=True)
@@ -44,7 +44,7 @@ def main(rab_host, rab_port):
     for subtype in subtypes:
 
         key = '*.*.' + subtype
-        channel.queue_bind(exchange='kismet_capture',
+        channel.queue_bind(exchange='capture',
                            queue=queue_name,
                            routing_key=key)
 

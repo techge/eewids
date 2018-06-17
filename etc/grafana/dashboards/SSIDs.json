@@ -79,7 +79,7 @@
               "type": "tag"
             }
           ],
-          "measurement": "kismet_capture",
+          "measurement": "capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -162,7 +162,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "kismet_capture",
+          "measurement": "capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -281,7 +281,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "kismet_capture",
+          "measurement": "capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -400,7 +400,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "kismet_capture",
+          "measurement": "capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -525,7 +525,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "kismet_capture",
+          "measurement": "capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -662,7 +662,7 @@
               "type": "tag"
             }
           ],
-          "measurement": "kismet_capture",
+          "measurement": "capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",

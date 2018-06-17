@@ -86,7 +86,7 @@
               "type": "tag"
             }
           ],
-          "measurement": "kismet_capture",
+          "measurement": "capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "B",
@@ -166,7 +166,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "kismet_capture",
+          "measurement": "capture",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",

@@ -1,7 +1,7 @@
-Fields Submitted to Exchange "kismet_capture"
+Fields Submitted to Exchange "capture"
 =============================================
 
-This page tracks all fields of messages submitted to RabbitMQ on exchange ['kismet_capture'](kismet_capture-topics.md).
+This page tracks all fields of messages submitted to RabbitMQ on exchange ['capture'](capture-topics.md).
 
 *Note*: This information is still in constant change and not considered stable yet.
 
@@ -16,7 +16,7 @@ This page tracks all fields of messages submitted to RabbitMQ on exchange ['kism
   * [QoS data/QoS Null only](#qos-dataqos-null-only)
 
 ## Always
-The following table includes information which is logged for *every* frame sent to 'kismet_capture'.
+The following table includes information which is logged for *every* frame sent to 'capture'.
 
 Key | Belonging to layer | Description of field | since version
 ----| ------------------ | -------------------- | -------------
@@ -38,9 +38,9 @@ antenna | radiotap: [Antenna](http://www.radiotap.org/fields/Antenna.html) | Uni
 wlan.fc | 80211 | Full frame control field  | 1.0
 wlan.fc.version | 80211 | Protocol version | 1.0
 wlan.fc.type | 80211 | Frame type | 1.0
-wlan.fc.type.str | 80211 | Frame type (human-readable string, see [here](/doc/kismet_capture-topics.md#frame-types-subtypes))  | 1.0
+wlan.fc.type.str | 80211 | Frame type (human-readable string, see [here](/doc/capture-topics.md#frame-typessubtypes))  | 1.0
 wlan.fc.subtype | 80211 | Frame subtype | 1.0
-wlan.fc.subtype.str | 80211 | Frame subtype (human-readable string, see [here](/doc/kismet_capture-topics.md#frame-types-subtypes))  | 1.0
+wlan.fc.subtype.str | 80211 | Frame subtype (human-readable string, see [here](/doc/capture-topics.md#frame-typessubtypes))  | 1.0
 wlan.duration | 80211 | Duration field  | 1.0
 wlan.addr1 | 80211 | First address field  | 1.0
 
