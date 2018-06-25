@@ -24,18 +24,18 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     protobuf-compiler \
     protobuf-c-compiler \
-    #python \
-    #python-setuptools \
-    #python-protobuf \
-    #python-sqlite \
-    #python-requests \
+    python \
+    python-setuptools \
+    python-protobuf \
+    python-sqlite \
+    python-requests \
     unzip \
     zlib1g-dev
 
 # Clone git repo and build kismet
 RUN git clone https://github.com/kismetwireless/kismet.git /opt/kismet && \
     cd /opt/kismet && \
-    ./configure --disable-python-tools && \
+    ./configure && \
     make && \
     make install
 
@@ -80,25 +80,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* && \
     apt-get clean -y && apt-get autoclean -y
 
-COPY --from=builder /usr/local/ /usr/local/
+COPY --from=builder /usr/local/bin/kismet_cap_linux_wifi /usr/local/bin/
 
-# Create user 'kismet' and add to new group kismet
-RUN groupadd -r kismet && useradd -m -g kismet kismet 
+ENTRYPOINT ["/usr/local/bin/kismet_cap_linux_wifi"]
 
-# Make capture binaries setuid, so that user kismet can start them
-RUN chmod u=rsx,g=rx,o-rwx /usr/local/bin/kismet_cap_linux_wifi && \
-    chown :kismet /usr/local/bin/kismet_cap_linux_wifi && \
-    chmod u=rsx,g=rx,o-rwx /usr/local/bin/kismet_cap_linux_bluetooth && \
-    chown :kismet /usr/local/bin/kismet_cap_linux_bluetooth
-
-ADD kismet.conf /usr/local/etc/
-ADD kismet_httpd.conf /home/kismet/.kismet/
-ADD kismet_httpd.conf /root/.kismet/
-
-# TODO Start as Kismet user, instead of root
-#USER kismet
-
-CMD ["/usr/local/bin/kismet", "--no-ncurses"]
-
-EXPOSE 2501
-EXPOSE 3501

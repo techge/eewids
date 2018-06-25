@@ -6,13 +6,12 @@ networks:
   influx:
 
 services:
-
   kismet-server:
-    image: eewids/kismet-server
+    image: eewids/kismet-server:stable
     networks:
       - kismet
     ports:
-      - "2501:2501"
+      - "2501:2501" # TODO close before release!
       - "3501:3501"
     tty: true
     stdin_open: true
@@ -24,7 +23,7 @@ services:
       - rabbit 
 
   kiscap2rabbit:
-    build: main/kismet-capture2rabbit 
+    image: eewids/kismet-capture2rabbit:stable
     networks:
       - kismet
       - rabbit 
@@ -43,7 +42,7 @@ services:
     restart: always 
 
   kisale2rabbit:
-    build: main/kismet-alert2rabbit
+    image: eewids/kismet-alert2rabbit:stable
     networks:
       - kismet
       - rabbit

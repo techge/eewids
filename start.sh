@@ -4,14 +4,14 @@ if [ $# -lt 1 ]; then
     echo
     echo "Usage: sudo ./start.sh [wifi-interface | --server]"
     echo
-    echo "e.g. sudo ./start.sh wlan0        # for standalone version"
-    echo "or   sudo ./start.sh --server     # only start Kismet server"
+    echo "e.g. sudo ./start.sh wlan0    # for standalone version"
+    echo "or   sudo ./start.sh --server # only start server without capturing"
     echo
     exit
 fi
 
 if [ "$EUID" -ne 0 ]
-    then echo "Please run as root or with 'sudo'."
+    then echo "Please run as root."
     exit
 fi
 
@@ -33,50 +33,51 @@ if [ ! -d "data/grafana" ]; then
     chown 472:472 data/grafana
 fi
 
+docker-compose up -d
+
 if [ "$1" == "--server" ]
 then
 
-    echo "docker-compose up -d ..."
-    docker-compose up -d
-
     echo
-    echo ######################################################################
+    echo "######################################################################"
     echo you could now connect your source to the kismet server via
     echo /usr/bin/kismet_cap_linux_wifi --connect localhost:3501 --source=wlan0
     echo or alike ...
     echo
     echo Afterwards, connect to http://localhost:3000 and 
     echo login with admin:admin
-    echo ######################################################################
+    echo "######################################################################"
     echo
     echo Press Ctrl-c to end Eewids
     echo
     docker-compose logs --follow logprint
 
-    echo
     echo "killing everything now :)"
     echo
     docker-compose down
 
 else
 
-    echo "docker-compose up ..."
+    export WIFI_DEVICE=$1
     docker-compose -f docker-compose.yml \
-                   -f docker-compose.standalone.yml up -d
+                   -f docker-compose.standalone.yml run -d kismet-remote 
 
-    echo "connecting interface with kismet..."
-    sleep 3
-    # inspired by Kismet wireless...
-    # https://github.com/kismetwireless/kismet/blob/master/packaging/docker/
-    PHY=$(cat /sys/class/net/"$1"/phy80211/name)
-    PID=$(docker container inspect -f '{{.State.Pid}}' eewids_kismet-server_1)
-    echo "iw phy $PHY set netns $PID"
-    iw phy "$PHY" set netns "$PID"
+    echo
+    echo "######################################################################"
+    echo
+    echo Connect to http://localhost:3000 and 
+    echo login with admin:admin
+    echo
+    echo Press Enter to end Eewids
+    echo
+    echo "######################################################################"
 
-    docker-compose logs --follow logprint
+    read
 
-    echo "killing everything now :)"
-    docker-compose down
+    echo "Killing everything now :)"
+    echo
+    docker-compose -f docker-compose.yml \
+                   -f docker-compose.standalone.yml down
 
     echo "Try to restore WiFi (based on NetworkManager)"
     sleep 3
