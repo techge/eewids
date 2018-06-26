@@ -91,52 +91,78 @@ subtype_table = [
     ]
 
 
-def detect_attack(data, send_channel):
+def detect_attack(data):
 
     detected = False
     
     # TODO
     # This is the main part you have to think about. Here is your main code.
     # data is a python dictionary which contains all fields described on
-    # https://github.com/techge/eewids/blob/master/docs/rabbitmq/capture-fields.md
+    # https://github.com/techge/eewids/blob/master/doc/capture-fields.md
     # TODO
 
     if detected:
 
         # TODO 
         # create alert messages based on fields described on
-        # https://github.com/techge/eewids/blob/master/docs/rabbitmq/messages-fields.md
+        # https://github.com/techge/eewids/blob/master/doc/messages-fields.md
         # TODO
         alertname = 'SomethingTerrible'
         description = 'SomethingTerrible detected...'
-        # TODO ...
+        # TODO add additional fields if needed
         
-        alert = {
+        message = {
+                'version': '1.0',
                 'name': alertname,
-                'description': description,
-                # TODO ...
+                'text': description,
+                'loglevel': 'alert',
+                # TODO add additional fields if needed
                 }
 
-        send_alert(alert, send_channel)
+        return 'alert', message
 
 
-def send_alert(alert, send_channel):
+def send_message(loglevel, message_cont, send_channel):
 
-    message = json.dumps(alert)
+    message = json.dumps(message_cont)
+    # TODO insert application name here!
+    key = 'appname.' + loglevel
 
-    # TODO adapt routing_key; format is servicename.messagetype
-    # see https://github.com/techge/eewids/blob/master/docs/rabbitmq/messages-topics.md
-    key = 'app.alert' 
     send_channel.basic_publish(exchange='messages',
                                routing_key=key,
                                body=message)
     
-    print(" [x] Alert %r sent." % message)
+    print(" [x] %r %r sent." % (loglevel, message_cont['text']))
+
+
+def queue_bindings(channel, queue_name, exch):
+
+    # TODO change exclusive to False if your detection method is scalable
+    # that means it can get done by multiple instances
+    # e.g. the app searches for suspicous fields in single frames and thus
+    # doesn't need a holistic view of all frames seen
+    channel.queue_declare(queue=queue_name, exclusive=True)
+
+    # queue binding per frame type choosen above
+    for frametype in type_table:
+
+        routing_key = '*.' + frametype + '.*'
+        channel.queue_bind(exchange=exch,
+                           queue=queue_name,
+                           routing_key=key)
+
+    # queue binding per frame subtype choosen above
+    for framesubtype in subtype_table:
+
+        key = '*.*.' + framesubtype 
+        channel.queue_bind(exchange=exch,
+                           queue=queue_name,
+                           routing_key=key)
 
 
 def main(rab_host, rab_port):
 
-    # sanity check
+    # sanity check, can be deleted after finishing the application
     if not type_table and not subtype_table:
         print("No frame type or subtype choosen, please adapt type tables to your needs!")
         sys.exit()
@@ -149,43 +175,31 @@ def main(rab_host, rab_port):
 
     # open channel to consume capture
     recv_channel = connection.channel()
-    recv_channel.exchange_declare(exchange='capture',
-                                  exchange_type='topic')
 
-    # open channel to publish alerts
+    # open channel to publish messages
     send_channel = connection.channel()
+
     send_channel.exchange_declare(exchange='messages',
-                                  exchange_type='topic')
+                                  exchange_type='topic',
+                                  durable=True,)
 
-    # TODO change exclusive to False if your detection can get split between multiple workers
-    result = recv_channel.queue_declare(exclusive=True)
-    queue_name = result.method.queue
-
-    # queue binding per frame type choosen above
-    for frametype in type_table:
-
-        routing_key = '*.' + frametype + '.*'
-        recv_channel.queue_bind(exchange='capture',
-                           queue=queue_name,
-                           routing_key=key)
-
-    # queue binding per frame subtype choosen above
-    for framesubtype in subtype_table:
-
-        key = '*.*.' + framesubtype 
-        recv_channel.queue_bind(exchange='capture',
-                           queue=queue_name,
-                           routing_key=key)
+    # create queue and bind topics based on choosen types
+    # TODO insert application name here!
+    queue_bindings(recv_channel, 'appname', 'capture')
 
     def callback(ch, method, properties, body):
 
-        # data arrived begin the actual detection work in function above
+        # data arrived start the detection
         data = json.loads(body)
-        detect_attack(data, send_channel)
+        loglevel, message_cont = detect_attack(data, options)
+
+        if loglevel is not None:
+            send_message(loglevel, message_cont, send_channel)
 
     recv_channel.basic_consume(callback,
-                          queue=queue_name,
-                          no_ack=True)
+    # TODO insert application name here!
+                               queue='appname',
+                               no_ack=True)
 
     print(' [*] Starting detection. To exit press CTRL+C')
     recv_channel.start_consuming()
