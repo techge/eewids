@@ -23,7 +23,7 @@ services:
       - rabbit 
 
   kiscap2rabbit:
-    image: eewids/kismet-capture2rabbit:stable
+    image: eewids/kiscap2rabbit:stable
     networks:
       - kismet
       - rabbit 
@@ -42,7 +42,7 @@ services:
     restart: always 
 
   kisale2rabbit:
-    image: eewids/kismet-alert2rabbit:stable
+    image: eewids/kisale2rabbit:stable
     networks:
       - kismet
       - rabbit

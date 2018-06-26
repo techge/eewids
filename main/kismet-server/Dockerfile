@@ -24,22 +24,17 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     protobuf-compiler \
     protobuf-c-compiler \
-    #python \
-    #python-setuptools \
-    #python-pip \
     unzip \
     zlib1g-dev
 
 # Clone git repo and build kismet
 RUN git clone https://github.com/kismetwireless/kismet.git /opt/kismet && \
     cd /opt/kismet && \
-    git reset --hard 8c60b1afeefb4a5971b4cb677716ec2bc6de7e4e && \
     ./configure --disable-python-tools && \
     make -j4 && \
     make install
 
 # This is kismet server only, no need for capture-tools
-# deleting here is easier for copy command below
 RUN rm /usr/local/bin/kismet_cap*
 
 ########################################################################
