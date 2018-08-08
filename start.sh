@@ -33,6 +33,7 @@ if [ ! -d "data/grafana" ]; then
     chown 472:472 data/grafana
 fi
 
+# start via docker-compose.yml file
 docker-compose up -d
 
 if [ "$1" == "--server" ]
@@ -40,17 +41,16 @@ then
 
     echo
     echo "######################################################################"
-    echo you could now connect your source to the kismet server via
-    echo /usr/bin/kismet_cap_linux_wifi --connect localhost:3501 --source=wlan0
-    echo or alike ...
+    echo You could now connect/start the capture tool on your source.
+    echo For more information have a look at
+    echo https://github.com/techge/eewids/blob/master/doc/getting-started.md
     echo
-    echo Afterwards, connect to http://localhost:3000 and 
-    echo login with admin:admin
+    echo Afterwards, connect to http://localhost:3000 and login with admin:admin
     echo "######################################################################"
     echo
     echo Press Ctrl-c to end Eewids
     echo
-    docker-compose logs --follow logprint
+    read
 
     echo "killing everything now :)"
     echo
@@ -58,29 +58,28 @@ then
 
 else
 
-    export WIFI_DEVICE=$1
-    docker-compose -f docker-compose.yml \
-                   -f docker-compose.standalone.yml run -d kismet-remote 
-
     echo
     echo "######################################################################"
     echo
-    echo Connect to http://localhost:3000 and 
-    echo login with admin:admin
+    echo Connect to http://localhost:3000 and login with admin:admin
     echo
     echo Press Enter to end Eewids
     echo
     echo "######################################################################"
 
+    iw dev $1 interface add ${1}mon type monitor
+    ifconfig ${1}mon up
+    ID=$(docker run -d -ti --net=host --privileged --restart always eewids-cap ${1}mon)
     read
 
     echo "Killing everything now :)"
     echo
-    docker-compose -f docker-compose.yml \
-                   -f docker-compose.standalone.yml down
+    docker kill $ID
+    docker-compose down
 
-    echo "Try to restore WiFi (based on NetworkManager)"
-    sleep 3
+    echo "Trying to restore WiFi to previous state (partly based on NetworkManager)"
+    ifconfig ${1}mon down
+    iw dev ${1}mon del
     nmcli device set $1 managed true
 
 fi
