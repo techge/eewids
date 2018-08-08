@@ -43,7 +43,7 @@
 #include <amqp_framing.h>
 #include <stdint.h>
 
-#include "utils.h"
+#include "amqp-utils.h"
 
 void die(const char *fmt, ...) {
   va_list ap;
