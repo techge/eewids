@@ -13,7 +13,7 @@ services:
       - "5672:5672"
 
   eewids-parser:
-    build: main/eewids-parser
+    image: eewids/eewids-parser
     networks:
       - rabbit 
     tty: true
