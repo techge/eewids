@@ -67,9 +67,7 @@ else
     echo
     echo "######################################################################"
 
-    iw dev $1 interface add ${1}mon type monitor
-    ifconfig ${1}mon up
-    ID=$(docker run -d -ti --net=host --privileged --restart always eewids/eewids-capture ${1}mon)
+    ID=$(docker run -d -ti --net=host --privileged --restart always eewids/kiscap2amqp --source ${1} --cap-exchange capture-raw)
     read
 
     echo "Killing everything now :)"

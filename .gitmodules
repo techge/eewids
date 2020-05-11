@@ -1,0 +1,3 @@
+[submodule "kiscap2amqp"]
+	path = kiscap2amqp
+	url = https://github.com/techge/kiscap2amqp
