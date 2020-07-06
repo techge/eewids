@@ -32,24 +32,35 @@ cd eewids
 sudo ./start.sh --server
 ```
 
-To use the capture tool separately e.g. to connect multiple sources to Eewids, you need to build the capture tool first on the machine. The capture tool needs libpcap and librabbitmq to get build successfully. For example on a Debian-based system you would need to install the following:
+To use the capture tool separately e.g. to connect multiple sources to Eewids, you need to build the capture tool first on the machine. It needs libpcap and librabbitmq to get build successfully. For example on a Debian-based system you would need to install the following:
 
 ```
-sudo apt-get update && sudo apt-get install build-essential libpcap-dev librabbitmq-dev
+sudo apt-get update
+sudo apt-get install \
+    build-essential \
+    libcap-dev \
+    libnl-3-dev \
+    libnl-genl-3-dev \
+    libnm-dev \
+    libpcap-dev \
+    librabbitmq-dev \
+    pkg-config
 ```
 
 After installing the depencies you can clone the repo and build the capture tool.
 
 ```
 git clone https://github.com/techge/eewids.git
-cd eewids/eewids-capture
-gcc -lpcap -lrabbitmq -o eewids-capture eewids-cap.c amqp-utils.c
+cd eewids/kiscap2amqp
+./configure
+make
 ```
 
 Now you can start the capture tool by typing the following:
 
 ```
-./eewids-capture wlan0 eewids-server
+./capture_linux_wifi/kiscap2amqp_linux_wifi --source wlan0 --rabbitmq localhost:5672 --capexchange capture-raw
 ``` 
-where ```wlan0``` is the Wi-Fi interface and ```eewids-server``` is the hostname of the machine you entered the start.sh script command.
+
+where `wlan0` is the Wi-Fi interface and `--rabbitmq` points to the RabbitMQ server on machine you entered the `start.sh --server` script command.
 

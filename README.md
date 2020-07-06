@@ -1,5 +1,6 @@
 # Easily Expandable Wireless Intrusion Detection System
-**Note:** This project is still under development and far away from being ready or perfect. However, feel free to play around and open issues if you see something interesting. Also have a look at the [getting-started](doc/getting-started.md) section first.
+
+**Note:** While this project may is in a state in which it can be used, it still needs a lot of development and thus is far away from being ready or perfect. However, feel free to play around and open issues if you see something interesting. Also have a look at the [getting-started](doc/getting-started.md) section before starting.
 
 ## Background 
 [Analyzing 0x90/wifi-arsenal](https://github.com/techge/wifi-arsenal) especially in search of wireless intrusion detection systems (WIDS) I realized that there just is no complete ready-to-go solution yet, at least regarding free and open source software (FOSS). For me a WIDS should
@@ -22,3 +23,13 @@ Let's look at a [honey pot](https://en.wikipedia.org/wiki/Honeypot_(computing)) 
 Another advantage is the freedom of choice of visualization/analyzing software. It is easily possible to include either influxdata's [TICK stack](https://www.influxdata.com/time-series-platform/) or the [ElasticSearch stack](https://www.elastic.co/), both Open Source analyzing software which also have anomaly detection methods. These stacks and other software already have interfaces to access RabbitMQ and to read json-formatted data and thus it is easy to extract the collected information as needed. Eewids already integrates InfluxDB with Grafana for visualization of captured data.
 
 This should make it easy to extend Eewids in various ways. Let's see what can happen.
+
+## TODOs
+
+These are limitations and problems that would be nice to get addressed (beside a lot of others ;-) ):
+
+* fix time problems -> in influxdb the time when telegraf is sending the data is stored -> we want to store the actual capture time. This might be decided by pcap on device or by RabbitMQ arrival time or something else
+* pcapng-export tool -> export pcapng stream by getting all messages of the capture-raw exchange during a specific time frame and craft it to a pcapng
+* look for the tag_keys problem: telegraf is getting the data as json from rabbitmq and is sending this data to influxdb - we can only use these values in the 'where' part of a query in grafana that we have defined as 'tag_keys' in etc/telegraf.conf before hand. this is most annoying
+* Look if Kapacitor (Influx stack) could add any value to Eewids
+* Add RabbitMQ metric to Grafana https://www.rabbitmq.com/prometheus.html
