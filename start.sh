@@ -33,31 +33,32 @@ if [ ! -d "data/grafana" ]; then
     chown 472:472 data/grafana
 fi
 
-# start via docker-compose.yml file
-docker-compose up -d
 
 if [ "$1" == "--server" ]
 then
 
+    docker-compose -f docker-compose.server.yml up -d
     echo
     echo "######################################################################"
-    echo You could now connect/start the capture tool on your source.
+    echo You can now connect/start the capture tool on your source.
     echo For more information have a look at
     echo https://github.com/techge/eewids/blob/master/doc/getting-started.md
     echo
     echo Afterwards, connect to http://localhost:3000 and login with admin:admin
+    echo
+    echo Press Enter to end Eewids
+    echo
     echo "######################################################################"
-    echo
-    echo Press Ctrl-c to end Eewids
-    echo
     read
 
-    echo "killing everything now :)"
+    echo "Killing everything now :)"
     echo
-    docker-compose down
+    docker-compose -f docker-compose.server.yml down
 
 else
 
+    export WIFI_DEVICE=$1
+    docker-compose up -d
     echo
     echo "######################################################################"
     echo
@@ -67,17 +68,15 @@ else
     echo
     echo "######################################################################"
 
-    ID=$(docker run -d -ti --net=host --privileged --restart always eewids/kiscap2amqp --source ${1} --cap-exchange capture-raw)
     read
 
     echo "Killing everything now :)"
     echo
-    docker kill $ID
     docker-compose down
 
     echo "Trying to restore WiFi to previous state (partly based on NetworkManager)"
-    ifconfig ${1}mon down
-    iw dev ${1}mon del
-    nmcli device set $1 managed true
+    ifconfig ${WIFI_DEVICE}mon down
+    iw dev ${WIFI_DEVICE}mon del
+    nmcli device set $WIFI_DEVICE managed true
 
 fi

@@ -35,22 +35,6 @@ services:
       - rabbit-server
     restart: unless-stopped
 
-  kiscap2amqp:
-    build: kiscap2amqp
-    tty: true
-    stdin_open: true
-    privileged: true
-    network_mode: host
-    entrypoint:
-      - ./capture_linux_wifi/kiscap2amqp_linux_wifi
-      - --source
-      - ${WIFI_DEVICE}
-      - --cap-exchange
-      - capture-raw
-    depends_on:
-      - rabbit-server
-    restart: unless-stopped
-
 ###################
 ## Visualization ##
 ###################
