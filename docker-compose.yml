@@ -5,15 +5,23 @@ networks:
   influx:
 
 services:
+###################
+## Rabbit Server ##
+###################
+  # https://registry.hub.docker.com/_/rabbitmq/
   rabbit-server:
-    image: rabbitmq
+    image: rabbitmq:3.8
     networks:
       - rabbit 
     ports:
-      - "5672:5672"
+      - "5672:5672" # exposed to host because kiscap2amqp needs networkmode: host
+    restart: unless-stopped
 
+##################
+## Eewids Stuff ##
+##################
   eewids-parser:
-    image: eewids/eewids-parser
+    build: eewids-parser
     networks:
       - rabbit 
     tty: true
@@ -25,74 +33,56 @@ services:
       - rabbit-server
     depends_on:
       - rabbit-server
-    restart: always 
+    restart: unless-stopped
 
-#############
-## Plugins ##
-#############
-  rogueap:
-    build: plugins/rogueAP/
-    networks:
-      - rabbit
-    volumes:
-      - type: bind
-        source: ./data/rogueAP
-        target: /lists
+  kiscap2amqp:
+    build: kiscap2amqp
     tty: true
     stdin_open: true
-    depends_on:
-      - rabbit-server
-      - eewids-parser
+    privileged: true
+    network_mode: host
     entrypoint:
-      - python
-      - rogueap.py
-      - --train
-      - --info
-    restart: on-failure
-
-  logprint:
-    build: plugins/logprint
-    networks:
-      - rabbit
-    tty: true
-    stdin_open: true
+      - ./capture_linux_wifi/kiscap2amqp_linux_wifi
+      - --source
+      - wlp2s0 # TODO decide this with help of variables
+      - --cap-exchange
+      - capture-raw # TODO decide this with help of variables
     depends_on:
       - rabbit-server
-      - eewids-parser
-    restart: always
-
+    restart: unless-stopped
 
 ###################
 ## Visualization ##
 ###################
   telegraf:
-    image: telegraf:1.4.0
+    image: telegraf:1.14
     volumes:
       - ./etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    links:
-      - influxdb
     depends_on:
       - rabbit-server
+      - influxdb
     networks:
       - influx
       - rabbit
-    ports:
+    expose:
       - "8092/udp"
       - "8094"
       - "8125/udp"
-    restart: always 
+    restart: unless-stopped
 
   influxdb:
-    image: influxdb:1.3.5
+    image: influxdb:1.8
     volumes:
       - ./data/influxdb:/var/lib/influxdb
     networks:
       - influx
-    ports:
+    expose:
       - "8086"
+    restart: unless-stopped
 
+  # https://grafana.com/docs/grafana/latest/installation/docker/
   grafana:
-    image: grafana/grafana:master
+    image: grafana/grafana:7.0.5
     volumes:
       - ./data/grafana:/var/lib/grafana
       - ./etc/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
@@ -104,5 +94,39 @@ services:
       - influx
     ports:
       - "3000:3000"
-    restart: always
+    restart: unless-stopped
+
+#############
+## Plugins ##
+#############
+#  rogueap:
+#    build: plugins/rogueAP/
+#    networks:
+#      - rabbit
+#    volumes:
+#      - type: bind
+#        source: ./data/rogueAP
+#        target: /lists
+#    tty: true
+#    stdin_open: true
+#    depends_on:
+#      - rabbit-server
+#      - eewids-parser
+#    entrypoint:
+#      - python
+#      - rogueap.py
+#      - --train
+#      - --info
+#    restart: on-failure
+#
+#  logprint:
+#    build: plugins/logprint
+#    networks:
+#      - rabbit
+#    tty: true
+#    stdin_open: true
+#    depends_on:
+#      - rabbit-server
+#      - eewids-parser
+#    restart: on-failure
 
