@@ -59,29 +59,27 @@ def main(rab_host, rab_port):
     send_channel = connection.channel()
 
     # declare exchange
-    # TODO maybe you need to check if it already exists!
     send_channel.exchange_declare(exchange='capture',
                                   exchange_type='topic',
                                   durable=True,)
 
-    # create queue for receiving raw capture data
-    # TODO you probably do not want a random queue, but one which is used by multiple workers!!!
-    result = recv_channel.queue_declare(queue='eewids-parser', exclusive=False)
-    queue_name = result.method.queue
-    #recv_queue = recv_channel.queue.declare(exclusive=True)
+    # declare queue for receiving raw capture data
+    recv_channel.queue_declare(queue='eewids-parser',
+                                        durable=True,
+                                        exclusive=False)
+
     # TODO change routing key on capture tool and here, make it meaningful and global/as argument
-    # FIXME do not abort if it does not exist
-    recv_channel.queue_bind(exchange='capture-raw', queue=queue_name, routing_key='*')
+    recv_channel.queue_bind(exchange='capture-raw', queue='eewids-parser', routing_key='*')
 
     def callback(ch, method, properties, body):
 
         parsed_data = p.packet_parse(body)
         distribute(parsed_data, send_channel)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    # TODO look up right arguments to make sure that this is dividable through multiple workers!
+    recv_channel.basic_qos(prefetch_count=1)
     recv_channel.basic_consume(on_message_callback=callback,
-                               queue=queue_name,
-                               auto_ack=True)
+                               queue='eewids-parser')
 
     print(' [*] Starting parsing. To exit press CTRL+C')
     recv_channel.start_consuming()
