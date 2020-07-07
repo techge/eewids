@@ -25,7 +25,8 @@ More information on RabbitMQs exchange types (remember Eewids is using topic exc
 
 Key | Belonging to layer | Description of field | since version
 ----| ------------------ | -------------------- | -------------
-version | EEWIDS | Indicates the availability of fields as noted on this page | 1.0
+version | Ewids | Indicates the availability of fields as noted on this page | 1.0
+capture_time_ms | Eewids | Timestamp as measured by capture tool | 1.0
 TSFT | radiotap: [TSFT](http://www.radiotap.org/fields/TSFT.html) | Value in usec of the MAC’s 64-bit 802.11 Time Synchronization Function timer | 1.0
 flags | radiotap: [Flags](http://www.radiotap.org/fields/Flags.html) | Properties of transmitted and received frames | 1.0
 rate | radiotap: [Rate](http://www.radiotap.org/fields/Rate.html) | TX/RX data rate | 1.0

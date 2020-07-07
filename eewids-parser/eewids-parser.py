@@ -30,8 +30,10 @@ import parser as p
 
 
 # TODO don't like the function name, make it more appropiate
-def distribute(cap_info, channel):
+def distribute(cap_info, properties, channel):
 
+    # preserve timestamp measured by capture device (used by Telegraf)
+    cap_info.update({'capture_time_ms': properties.timestamp})
     message = json.dumps(cap_info)
 
     # routing_key is pcapng.if_name.type.subtype 
@@ -39,7 +41,8 @@ def distribute(cap_info, channel):
     key = 'if_name' + '.' + cap_info['wlan.fc.type.str'] + '.' + cap_info['wlan.fc.subtype.str']
     channel.basic_publish(exchange='capture',
                           routing_key=key,
-                          body=message)
+                          body=message,
+                          properties=properties)
 
     print(" [x] Sent ",message)
 
@@ -65,8 +68,8 @@ def main(rab_host, rab_port):
 
     # declare queue for receiving raw capture data
     recv_channel.queue_declare(queue='eewids-parser',
-                                        durable=True,
-                                        exclusive=False)
+                               durable=True,
+                               exclusive=False)
 
     # TODO change routing key on capture tool and here, make it meaningful and global/as argument
     recv_channel.queue_bind(exchange='capture-raw', queue='eewids-parser', routing_key='*')
@@ -74,7 +77,7 @@ def main(rab_host, rab_port):
     def callback(ch, method, properties, body):
 
         parsed_data = p.packet_parse(body)
-        distribute(parsed_data, send_channel)
+        distribute(parsed_data, properties, send_channel)
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     recv_channel.basic_qos(prefetch_count=1)

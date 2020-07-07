@@ -28,7 +28,6 @@ This should make it easy to extend Eewids in various ways. Let's see what can ha
 
 These are limitations and problems that would be nice to get addressed (beside a lot of others ;-) ):
 
-* fix time problems -> in influxdb the time when telegraf is sending the data is stored -> we want to store the actual capture time. This might be decided by pcap on device or by RabbitMQ arrival time or something else
 * pcapng-export tool -> export pcapng stream by getting all messages of the capture-raw exchange during a specific time frame and craft it to a pcapng
 * look for the tag_keys problem: telegraf is getting the data as json from rabbitmq and is sending this data to influxdb - we can only use these values in the 'where' part of a query in grafana that we have defined as 'tag_keys' in etc/telegraf.conf before hand. this is most annoying
 * Look if Kapacitor (Influx stack) could add any value to Eewids
