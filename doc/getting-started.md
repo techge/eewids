@@ -14,7 +14,7 @@ To run Eewids you need
 If you just want to give it a shot and you have a computer with a compatible WiFi card and docker and docker-compose installed (see [requirements](#requirements)), you may just use the start.sh in main directory of the repo: 
 
 ```
-git clone https://github.com/techge/eewids.git
+git clone --recursive https://github.com/techge/eewids.git
 cd eewids
 sudo ./start.sh wlan0
 ```
@@ -27,7 +27,7 @@ Now visit http://localhost:3000 for grafana visualization and/or get familiar wi
 To only start all server components of Eewids, type the following commands on the machine which should process the main parts of Eewids (=the server):
 
 ```
-git clone https://github.com/techge/eewids.git
+git clone --recursive https://github.com/techge/eewids.git
 cd eewids
 sudo ./start.sh --server
 ```
@@ -50,7 +50,7 @@ sudo apt-get install \
 After installing the depencies you can clone the repo and build the capture tool.
 
 ```
-git clone https://github.com/techge/eewids.git
+git clone --recursive https://github.com/techge/eewids.git
 cd eewids/kiscap2amqp
 ./configure
 make
